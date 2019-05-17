@@ -5,8 +5,7 @@ class Guage(models.Model):
     value = models.CharField(max_length=600)
 
 class Layout(models.Model):
-    pass
-
+    name = models.CharField(max_length=100)
 
 class LayoutItem(models.Model):
     parent = models.ForeignKey(Layout, on_delete=models.CASCADE)
