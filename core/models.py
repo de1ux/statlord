@@ -10,3 +10,6 @@ class Layout(models.Model):
 class LayoutItem(models.Model):
     parent = models.ForeignKey(Layout, on_delete=models.CASCADE)
     value = models.ForeignKey(Guage, on_delete=models.CASCADE)
+
+class Display(models.Model):
+    name = models.CharField(max_length=100, null=True)
