@@ -1,16 +1,53 @@
 import * as React from "react";
-import {CreateGlobalStore, GlobalStore} from "./Store";
+import {CONTROL_DROPPED, CreateGlobalStore, GlobalStore, State} from "./Store";
 import {CSSProperties} from "react";
+import {Unsubscribe} from "redux";
 
 const hitareaStyle: CSSProperties = {
-    position: "relative",
-    width: "100%",
-    height: "100%"
+    position: "absolute",
+    width: "500px",
+    height: "500px",
+    zIndex: 2
 };
 
-export class Hitarea extends React.Component<{}, {}> {
-    onMouseUp = (e) => {
-        console.log("yes");
+interface HitareaProps {
+    store: GlobalStore
+}
+
+export class Hitarea extends React.Component<HitareaProps, {}> {
+    stagedControl: any;
+    unsubscribe: Unsubscribe;
+
+    constructor(props: HitareaProps) {
+        super(props);
+        this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
+    }
+
+    componentWillUnmount(): void {
+        this.unsubscribe()
+    }
+
+    onStoreTrigger = () => {
+        let state: State = this.props.store.getState();
+        if (state.controlSelected) {
+            this.stagedControl = state.controlSelected.control;
+        }
+
+    };
+
+    onMouseUp = (e: React.MouseEvent) => {
+        if (this.stagedControl === null) {
+            return;
+        }
+        this.props.store.dispatch({
+            type: CONTROL_DROPPED,
+            controlDropped: {
+                x: e.clientX,
+                y: e.clientY,
+                control: this.stagedControl,
+            },
+        });
+        this.stagedControl = null;
     };
 
     render() {

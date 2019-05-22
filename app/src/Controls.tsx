@@ -2,7 +2,7 @@ import * as React from "react";
 import {CONTROL_SELECTED, CreateGlobalStore, GlobalStore} from "./Store";
 import {getAPIEndpoint} from "./Utiltities";
 
-interface Gauge {
+export interface Gauge {
     pk: string;
     key: string;
     value: string;

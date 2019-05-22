@@ -25,8 +25,8 @@ export class Editor extends React.Component<{}, {}> {
             <Controls store={this.store} />
             <div style={editorStyle}>
 
-                <Hitarea/>
-                <Overlay/>
+                <Hitarea store={this.store}/>
+                <Overlay store={this.store}/>
             </div>
         </div>
     }
