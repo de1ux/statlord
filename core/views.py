@@ -1,7 +1,10 @@
-from django.shortcuts import render
+from django.core.serializers import serialize
+
 from django.http import HttpResponse
+
+from core.models import Guage
 
 
 def index(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return HttpResponse(serialize('json', Guage.objects.all(), fields=('key', 'value')))
 
