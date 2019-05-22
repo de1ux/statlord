@@ -4,6 +4,13 @@ import {Hitarea} from "./Hitarea";
 import {Overlay} from "./Overlay";
 import {Controls} from "./Controls";
 
+
+const editorStyle = {
+    height: "500px",
+    width: "500px",
+    backgroundColor: "gray"
+};
+
 export class Editor extends React.Component<{}, {}> {
     store: GlobalStore;
 
@@ -15,9 +22,12 @@ export class Editor extends React.Component<{}, {}> {
 
     render() {
         return <div>
-            <Hitarea />
-            <Controls />
-            <Overlay />
+            <Controls store={this.store} />
+            <div style={editorStyle}>
+
+                <Hitarea/>
+                <Overlay/>
+            </div>
         </div>
     }
 }

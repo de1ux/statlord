@@ -1,24 +1,28 @@
 import * as React from "react";
-import {CreateGlobalStore, GlobalStore} from "./Store";
+import {CONTROL_SELECTED, CreateGlobalStore, GlobalStore} from "./Store";
 import {getAPIEndpoint} from "./Utiltities";
 
-interface Guage {
+interface Gauge {
     pk: string;
     key: string;
     value: string;
 }
 
-interface ControlsState {
-    guages: Array<Guage>;
+interface ControlsProps {
+    store: GlobalStore
 }
 
-export class Controls extends React.Component<{}, ControlsState> {
+interface ControlsState {
+    guages: Array<Gauge>;
+}
+
+export class Controls extends React.Component<ControlsProps, ControlsState> {
     state: ControlsState = {
         guages: [],
     };
 
     componentDidMount(): void {
-        fetch(getAPIEndpoint() + "/guages")
+        fetch(getAPIEndpoint() + "/gauges")
             .then(data => data.json())
             .then((data) => {
                 this.setState({
@@ -33,10 +37,18 @@ export class Controls extends React.Component<{}, ControlsState> {
             })
     }
 
-    renderControls() {
-        return this.state.guages.map((guage: Guage) =>
-            <div draggable style={{cursor: 'move'}}>
-                {JSON.stringify(guage)}
+    renderControls = () => {
+        return this.state.guages.map((gauge: Gauge) =>
+            <div style={{cursor: 'move'}} onMouseDown={(e) => {
+                e.preventDefault();
+                this.props.store.dispatch({
+                    type: CONTROL_SELECTED,
+                    controlSelected: {
+                        control: gauge,
+                    },
+                });
+            }}>
+                {JSON.stringify(gauge)}
             </div>
         );
     }

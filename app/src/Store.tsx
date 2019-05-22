@@ -1,46 +1,45 @@
-import { createStore, Store } from 'redux';
+import {createStore, Store} from 'redux';
 
 export const
-  GLOBAL_MESSAGE = 'GLOBAL_MESSAGE',
-  REFRESH_JOBS = 'REFRESH_JOBS';
+    CONTROL_SELECTED = 'CONTROL_SELECTED',
+    CONTROL_DROPPED = 'CONTROL_DROPPED';
 
-export interface GlobalMessage {
-  message: string;
-  time: string;
+export interface ControlSelectedMessage {
+    control: any
 }
 
-export interface RefreshJobs {
-  time: string;
+export interface ControlDroppedMessage {
+    control: any
+    x: number;
+    y: number;
 }
 
 export interface State {
-  globalMessage: GlobalMessage;
-  refreshJobs: RefreshJobs;
+    controlDropped: ControlDroppedMessage;
+    controlSelected: ControlSelectedMessage;
 }
 
-export interface Action {
-  type: string;
-  globalMessage: GlobalMessage;
-  refreshJobs: RefreshJobs;
+export interface Action extends State {
+    type: string;
 }
 
 function reducer(state: State, action: Action) {
-  switch (action.type) {
-    case GLOBAL_MESSAGE:
-      return {
-        ...state, globalMessage: action.globalMessage
-      };
-    case REFRESH_JOBS:
-      return {
-        ...state, refreshJobs: action.refreshJobs
-      };
-    default:
-      return state;
-  }
+    switch (action.type) {
+        case CONTROL_DROPPED:
+            return {
+                ...state, controlDropped: action.controlDropped
+            };
+        case CONTROL_SELECTED:
+            return {
+                ...state, controlSelected: action.controlSelected
+            };
+        default:
+            return state;
+    }
 }
 
 export type GlobalStore = Store<State>;
 
 export function CreateGlobalStore(): GlobalStore {
-  return createStore(reducer);
+    return createStore(reducer);
 }
