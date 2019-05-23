@@ -1,22 +1,29 @@
 import {createStore, Store} from 'redux';
+import {Gauge} from "./Models";
 
 export const
     CONTROL_SELECTED = 'CONTROL_SELECTED',
-    CONTROL_DROPPED = 'CONTROL_DROPPED';
+    CONTROL_DROPPED = 'CONTROL_DROPPED',
+    CONTROL_UPDATED = 'CONTROL_UPDATED';
 
 export interface ControlSelectedMessage {
-    control: any
+    control: Gauge
 }
 
 export interface ControlDroppedMessage {
-    control: any
+    control: Gauge
     x: number;
     y: number;
+}
+
+export interface ControlUpdatedMessage {
+    control: Gauge
 }
 
 export interface State {
     controlDropped: ControlDroppedMessage;
     controlSelected: ControlSelectedMessage;
+    controlUpdated: ControlUpdatedMessage;
 }
 
 export interface Action extends State {
@@ -32,6 +39,10 @@ function reducer(state: State, action: Action) {
         case CONTROL_SELECTED:
             return {
                 ...state, controlSelected: action.controlSelected
+            };
+        case CONTROL_UPDATED:
+            return {
+                ...state, controlUpdated: action.controlUpdated
             };
         default:
             return state;

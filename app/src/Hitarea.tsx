@@ -2,6 +2,7 @@ import * as React from "react";
 import {CONTROL_DROPPED, CreateGlobalStore, GlobalStore, State} from "./Store";
 import {CSSProperties} from "react";
 import {Unsubscribe} from "redux";
+import {Gauge} from "./Models";
 
 const hitareaStyle: CSSProperties = {
     position: "absolute",
@@ -15,7 +16,7 @@ interface HitareaProps {
 }
 
 export class Hitarea extends React.Component<HitareaProps, {}> {
-    stagedControl: any;
+    stagedControl: Gauge;
     unsubscribe: Unsubscribe;
 
     constructor(props: HitareaProps) {

@@ -17,3 +17,6 @@ class LayoutItem(models.Model):
 
 class Display(models.Model):
     name = models.CharField(max_length=100, null=True)
+    available = models.BooleanField(default=False)
+    resolution_x = models.IntegerField(default=0)
+    resolution_y = models.IntegerField(default=0)

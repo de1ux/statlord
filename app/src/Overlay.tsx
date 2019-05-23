@@ -1,13 +1,13 @@
 import * as React from "react";
-import {ControlDroppedMessage, CreateGlobalStore, GlobalStore, State} from "./Store";
+import {ControlDroppedMessage, ControlUpdatedMessage, CreateGlobalStore, GlobalStore, State} from "./Store";
 import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
-import {Gauge} from "./Controls";
+import {Gauge} from "./Models";
 
 interface Element {
     x: number;
     y: number;
-    control: any;
+    control: Gauge;
 }
 
 const overlayCanvasStyle = {
@@ -25,7 +25,7 @@ interface OverlayProps {
 }
 
 export class Overlay extends React.Component<OverlayProps, {}> {
-    elements: Array<Element> = [];
+    elements: Map<String, Element> = new Map();
     unsubscribe: Unsubscribe;
     canvasRef: RefObject<HTMLCanvasElement>;
     ctx: CanvasRenderingContext2D;
@@ -44,23 +44,39 @@ export class Overlay extends React.Component<OverlayProps, {}> {
             this.controlDropped(state.controlDropped);
             this.lastControlDropped = state.controlDropped;
         }
+
+        if (state.controlUpdated) {
+            this.controlUpdated(state.controlUpdated);
+        }
     };
 
+    controlUpdated(message: ControlUpdatedMessage) {
+        if (!this.elements[message.control.key]) {
+            return
+        }
+
+        this.elements[message.control.key].control = message.control;
+        this.draw()
+    }
+
+    // controlDropped occurs when a control is dropped onto the overlay
     controlDropped(message: ControlDroppedMessage) {
-        this.elements.push({
+        this.elements[message.control.key] = {
             x: message.x,
             y: message.y,
             control: message.control,
-        });
+        };
 
         this.draw();
     };
 
     draw = () => {
         this.ctx.clearRect(0, 0, 500, 500);
-        for (let el of this.elements) {
-            this.ctx.fillText((el.control as Gauge).value, el.x, el.y);
-        }
+
+        Object.values(this.elements).map((el: Element) => {
+            this.ctx.fillText(el.control.value, el.x, el.y);
+        });
+
         this.ctx.fillText("hi", 10, 10);
         this.ctx.stroke();
     };

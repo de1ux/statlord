@@ -1,12 +1,7 @@
 import * as React from "react";
-import {CONTROL_SELECTED, CreateGlobalStore, GlobalStore} from "./Store";
+import {CONTROL_SELECTED, CONTROL_UPDATED, CreateGlobalStore, GlobalStore} from "./Store";
 import {getAPIEndpoint} from "./Utiltities";
-
-export interface Gauge {
-    pk: string;
-    key: string;
-    value: string;
-}
+import {Gauge} from "./Models";
 
 interface ControlsProps {
     store: GlobalStore
@@ -22,18 +17,32 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
     };
 
     componentDidMount(): void {
-        fetch(getAPIEndpoint() + "/gauges")
+        this.setFutureGaugeRefresh()
+    }
+
+    setFutureGaugeRefresh(): void {
+        fetch(getAPIEndpoint() + "/gauges/")
             .then(data => data.json())
             .then((data) => {
                 this.setState({
                     guages: data.map((d: any) => {
                         return {
-                            pk: d.pk,
-                            key: d.fields.key,
-                            value: d.fields.value
+                            key: d.key,
+                            value: d.value
                         };
                     })
                 });
+
+                for (let gauge of data) {
+                    this.props.store.dispatch({
+                        type: CONTROL_UPDATED,
+                        controlUpdated: {
+                            control: gauge,
+                        },
+                    })
+                }
+
+                setTimeout(() => this.setFutureGaugeRefresh(), 3000);
             })
     }
 
