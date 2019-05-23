@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Gauge(models.Model):
-    key = models.CharField(max_length=200)
+    key = models.CharField(max_length=200, primary_key=True)
     value = models.CharField(max_length=600)
 
 

@@ -1,2 +1,4 @@
 Django==2.2.1
 django-cors-headers==3.0.1
+djangorestframework==3.9.4
+requests==2.21.0

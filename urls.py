@@ -15,8 +15,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from rest_framework import routers
+from rest_framework.urlpatterns import format_suffix_patterns
+
+from core import views
+
 
 urlpatterns = [
-    path('api/', include('core.urls')),
-    path('admin/', admin.site.urls),
+    path('api/gauges/', views.GaugeList.as_view()),
+    path('api/gauges/<str:key>/', views.GaugeItem.as_view()),
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
