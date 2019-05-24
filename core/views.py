@@ -5,8 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Gauge, Display
-from core.serializers import GaugeSerializer, DisplaySerializer
+from core.models import Gauge, Display, Layout
+from core.serializers import GaugeSerializer, DisplaySerializer, LayoutSerializer
 
 
 class GaugeList(APIView):
@@ -55,3 +55,20 @@ class DisplayItem(APIView):
             return Response(serializer.data)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LayoutList(APIView):
+    def get(self, request, format=None):
+        layouts = Layout.objects.all()
+        serializer = LayoutSerializer(layouts, many=True)
+        return Response(serializer.data)
+
+
+class LayoutItem(APIView):
+    def put(self, request, key, format=None):
+        layout, created = Layout.objects.update_or_create(key=key, defaults=({
+            'data': str(request.data['data']).encode()}))
+
+        serializer = LayoutSerializer(layout)
+        return Response(serializer.data)
+

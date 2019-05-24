@@ -26,6 +26,8 @@ urlpatterns = [
     path('api/gauges/<str:key>/', views.GaugeItem.as_view()),
     path('api/displays/', views.DisplayList.as_view()),
     path('api/displays/<str:key>/', views.DisplayItem.as_view()),
+    path('api/layouts/', views.LayoutList.as_view()),
+    path('api/layouts/<str:key>/', views.LayoutItem.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

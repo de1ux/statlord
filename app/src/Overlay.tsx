@@ -10,7 +10,7 @@ import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
 import {Display, Gauge} from "./Models";
 import {SelectionControls} from "./SelectionControls";
-import {defaultTextProperties} from "./Utiltities";
+import {defaultTextProperties, getAPIEndpoint} from "./Utiltities";
 
 declare var fabric: any;
 
@@ -50,6 +50,29 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
 
         this.state = {};
+
+        this.setFutureLayout();
+    }
+
+    setFutureLayout() {
+        if (this.canvas === undefined) {
+            setTimeout(() => this.setFutureLayout(), 3000);
+            return;
+        }
+
+        let body = JSON.stringify({'data': this.canvas.toJSONWithKeys()});
+
+        fetch(getAPIEndpoint() + "/layouts/default/", {
+            method: 'PUT',
+            mode: 'cors',
+            body: body,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'same-origin'
+        }).then(data => {
+            setTimeout(() => this.setFutureLayout(), 3000);
+        })
     }
 
     onStoreTrigger = () => {
@@ -78,6 +101,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             ...defaultTextProperties(),
             left: 10,
             top: 10,
+            key: message.control.key,
         };
 
         let text = new fabric.Text(message.control.value, textProperties);
@@ -94,7 +118,9 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 selectedObject: undefined,
             })
         });
-        text.on('keypress', () => {console.log('asdf')})
+        text.on('keypress', () => {
+            console.log('asdf')
+        })
 
         this.controls[message.control.key] = text;
         this.canvas.add(text);
@@ -143,6 +169,16 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
     componentDidMount(): void {
         this.canvas = new fabric.Canvas("overlay");
+        // add a method to add the "key" property to object output
+        this.canvas.toJSONWithKeys = () => {
+            let origJSON = this.canvas.toJSON();
+            origJSON.objects = this.canvas.getObjects().map((object: any) => {
+                let origObjectJSON = object.toJSON();
+                origObjectJSON.key = object.key;
+                return origObjectJSON;
+            });
+            return origJSON;
+        }
     }
 
     componentWillUnmount(): void {
@@ -154,10 +190,13 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             return;
         }
         this.canvas.renderAll();
-    }
+    };
 
     render() {
         return <div style={{display: "flex"}}>
+            <div>
+                <button onClick={(e) => console.log(this.canvas.toJSONWithKeys())}>toJSON</button>
+            </div>
             <div>
                 <canvas id="overlay" width={`${this.props.display.resolution_x}px`}
                         height={`${this.props.display.resolution_y}px`} style={{border: "1px solid #aaa"}}>
@@ -165,7 +204,8 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             </div>
             <div>
                 <SelectionControls object={this.state.selectedObject} selected={this.state.selectedControl}
-                                   renderAll={this.renderCanvas} delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>
+                                   renderAll={this.renderCanvas}
+                                   delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>
             </div>
         </div>
     }
