@@ -56,7 +56,7 @@ export class Editor extends React.Component<{}, EditorState> {
     mapDisplaysToOverlays = () => {
         let overlays = [];
         for (let display of this.state.displays) {
-            overlays.push(<Overlay store={this.store} display={display} layout={this.state.layout}/>);
+            overlays.push(<Overlay store={this.store} display={display} layout={this.state.layout} viewOnly={false} />);
         }
         return overlays;
     };

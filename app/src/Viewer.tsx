@@ -1,67 +1,73 @@
 import * as React from "react";
-import {CreateGlobalStore, GlobalStore} from "./Store";
+import {CONTROL_UPDATED, CreateGlobalStore, GlobalStore} from "./Store";
+import {Overlay} from "./Overlay";
+import {Controls} from "./Controls";
+import {getAPIEndpoint, getLayout} from "./Utiltities";
+import {Display, Layout} from "./Models";
 
-const editorStyle = {
-    height: "500px",
-    width: "500px",
-    backgroundColor: "gray"
-};
-
-interface ViewerProps {
-    width?: number;
-    height?: number;
-    name?: string;
-}
 
 interface ViewerState {
-    ready: boolean,
-    width: number,
-    height: number,
-    name: string,
+    displays: Array<Display>
+    layout?: Layout;
 }
 
-export class Viewer extends React.Component<ViewerProps, ViewerState> {
+export class Viewer extends React.Component<{}, ViewerState> {
+    state: ViewerState = {
+        displays: [],
+    };
     store: GlobalStore;
 
-    constructor(props: ViewerProps) {
+    constructor(props: {}) {
         super(props);
 
         this.store = CreateGlobalStore();
-        this.state = {
-            ready: false,
-            width: this.props.width === undefined ? window.innerWidth : this.props.width,
-            height: this.props.height === undefined ? window.innerHeight : this.props.height,
-            name: this.props.name === undefined ? 'test-display' : this.props.name,
-        };
     }
 
     componentDidMount(): void {
-        console.log(window.location.search.indexOf)
+        getLayout().then((layout: Layout) => {
+            if (layout === undefined) {
+                fetch(getAPIEndpoint() + "/layouts/default/", {
+                    method: 'PUT',
+                    body: "",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }).then(data => {
+                    this.setState({layout: {data: ""}})
+                })
+            }
+            this.setState({layout: layout})
+        });
+        this.setFutureDisplaysRefresh()
     }
 
-    renderSetup() {
-        return <div>
-            <label>Name</label>
-            <input type='text' value={this.state.name} onChange={(e) => this.setState({name: e.target.value})}/>
-            <br/>
+    setFutureDisplaysRefresh() {
+        fetch(getAPIEndpoint() + "/displays/")
+            .then(data => data.json())
+            .then((displays) => {
+                this.setState({
+                    displays: displays
+                });
 
-            <label>Width</label>
-            <input type='number' value={this.state.width} onChange={(e) => this.setState({width: parseInt(e.target.value)})} />
-            <br/>
-
-            <label>Height</label>
-            <input type='number' value={this.state.height} onChange={(e) => this.setState({height: parseInt(e.target.value)})}/>
-            <br/>
-
-            <button onClick={(e) => this.setState({ready: true})}>Create</button>
-        </div>
+                setTimeout(() => this.setFutureDisplaysRefresh(), 3000);
+            })
     }
+
+    mapDisplaysToOverlays = () => {
+        let overlays = [];
+        for (let display of this.state.displays) {
+            overlays.push(<Overlay store={this.store} display={display} layout={this.state.layout} viewOnly />);
+        }
+        return overlays;
+    };
 
     render() {
-        if (!this.state.ready) {
-            return this.renderSetup()
+        if (!this.state.layout) {
+            return "Awaiting layout..."
         }
+
         return <div>
+            {this.mapDisplaysToOverlays()}
         </div>
     }
 }

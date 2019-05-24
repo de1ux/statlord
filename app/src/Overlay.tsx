@@ -30,6 +30,7 @@ interface OverlayProps {
     store: GlobalStore;
     display: Display;
     layout: Layout;
+    viewOnly: boolean;
 }
 
 interface OverlayState {
@@ -210,9 +211,9 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 </canvas>
             </div>
             <div>
-                <SelectionControls object={this.state.selectedObject}
+                {this.props.viewOnly ? <div /> : <SelectionControls object={this.state.selectedObject}
                                    renderAll={this.renderCanvas}
-                                   delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>
+                                   delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>}
             </div>
         </div>
     }
