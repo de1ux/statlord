@@ -3,18 +3,14 @@ import * as ReactDOM from 'react-dom';
 import {Editor} from "./src/Editor";
 import {Viewer} from "./src/Viewer";
 
-
-const urlParams = new URLSearchParams(window.location.search);
-const viewer = urlParams.get('viewer');
-const displayName = urlParams.get('display');
-if (displayName && viewer) {
+if (window.location.search.indexOf("viewer=true") === -1) {
     ReactDOM.render(
-        <Viewer name={displayName}/>,
+        <Editor/>,
         document.getElementById('root')
     );
 } else {
     ReactDOM.render(
-        <Editor/>,
+        <Viewer />,
         document.getElementById('root')
     );
 }

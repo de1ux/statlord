@@ -32,8 +32,8 @@ $ curl -XPUT -d '{"value": "79F"}' -H "Content-Type: application/json" http://0.
 
 Open a couple browser windows (keep them open!)
 
-* [http://0.0.0.0:3000/?viewer=true&key=display1](http://0.0.0.0:3000/?viewer=true&key=display1)
-* [http://0.0.0.0:3000/?viewer=true&key=display2](http://0.0.0.0:3000/?viewer=true&key=display2)
+* http://0.0.0.0:3000/?viewer=true
+* http://0.0.0.0:3000/?viewer=true
 
 Open the editor [http://0.0.0.0:3000](http://0.0.0.0:3000/), and drag and drop the "temperature" gauge onto the displays.
 
@@ -48,7 +48,7 @@ $ curl -XPUT \
 
 ## Usage (other displays)
 
-Subscribe your other displays to the API with a unique name and the resolution
+Register displays in the API with a unique name and its resolution
 
 ```bash
 $ curl -XPUT \
