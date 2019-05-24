@@ -24,6 +24,8 @@ from core import views
 urlpatterns = [
     path('api/gauges/', views.GaugeList.as_view()),
     path('api/gauges/<str:key>/', views.GaugeItem.as_view()),
+    path('api/displays/', views.DisplayList.as_view()),
+    path('api/displays/<str:key>/', views.DisplayItem.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

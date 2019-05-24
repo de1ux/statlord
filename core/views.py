@@ -5,8 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Gauge
-from core.serializers import GaugeSerializer
+from core.models import Gauge, Display
+from core.serializers import GaugeSerializer, DisplaySerializer
 
 
 class GaugeList(APIView):
@@ -31,7 +31,25 @@ class GaugeItem(APIView):
     def put(self, request, key, format=None):
         gauge, created = Gauge.objects.update_or_create(key=key, defaults=({'value': request.data['value']}))
         print(f"Created: {created}")
-        serializer = GaugeSerializer(gauge, data=request.data)
+        serializer = GaugeSerializer(gauge)
+        return Response(serializer.data)
+
+
+class DisplayList(APIView):
+    def get(self, request, format=None):
+        displays = Display.objects.all()
+        serializer = DisplaySerializer(displays, many=True)
+        return Response(serializer.data)
+
+
+class DisplayItem(APIView):
+    def put(self, request, key, format=None):
+        display, created = Display.objects.update_or_create(key=key, defaults=({
+            'resolution_x': request.data['resolution_x'],
+            'resolution_y': request.data['resolution_y'],
+            'available': True}))
+
+        serializer = DisplaySerializer(display, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

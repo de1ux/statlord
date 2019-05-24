@@ -17,10 +17,10 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
     };
 
     componentDidMount(): void {
-        this.setFutureGaugeRefresh()
+        this.setFutureGaugesRefresh()
     }
 
-    setFutureGaugeRefresh(): void {
+    setFutureGaugesRefresh(): void {
         fetch(getAPIEndpoint() + "/gauges/")
             .then(data => data.json())
             .then((data) => {
@@ -42,7 +42,7 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
                     })
                 }
 
-                setTimeout(() => this.setFutureGaugeRefresh(), 3000);
+                setTimeout(() => this.setFutureGaugesRefresh(), 3000);
             })
     }
 

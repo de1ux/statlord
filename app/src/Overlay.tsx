@@ -2,7 +2,8 @@ import * as React from "react";
 import {ControlDroppedMessage, ControlUpdatedMessage, CreateGlobalStore, GlobalStore, State} from "./Store";
 import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
-import {Gauge} from "./Models";
+import {Display, Gauge} from "./Models";
+import {Hitarea} from "./Hitarea";
 
 interface Element {
     x: number;
@@ -10,18 +11,15 @@ interface Element {
     control: Gauge;
 }
 
-const overlayCanvasStyle = {
-    height: "500px",
-    width: "500px",
-};
-
 const overlayStyle: CSSProperties = {
     position: 'absolute',
     zIndex: 1,
+    backgroundColor: "gray"
 };
 
 interface OverlayProps {
     store: GlobalStore;
+    display: Display;
 }
 
 export class Overlay extends React.Component<OverlayProps, {}> {
@@ -72,12 +70,13 @@ export class Overlay extends React.Component<OverlayProps, {}> {
 
     draw = () => {
         this.ctx.clearRect(0, 0, 500, 500);
+        this.ctx.fillStyle = 'black';
+        this.ctx.font = '24px sans-serif';
 
         Object.values(this.elements).map((el: Element) => {
             this.ctx.fillText(el.control.value, el.x, el.y);
         });
 
-        this.ctx.fillText("hi", 10, 10);
         this.ctx.stroke();
     };
 
@@ -91,7 +90,9 @@ export class Overlay extends React.Component<OverlayProps, {}> {
 
     render() {
         return <div style={overlayStyle}>
-            <canvas {...overlayCanvasStyle} ref={this.canvasRef}>
+            <Hitarea store={this.props.store} display={this.props.display}/>
+            <canvas width={`${this.props.display.resolution_x}px`} height={`${this.props.display.resolution_y}px`}
+                    ref={this.canvasRef}>
             </canvas>
         </div>
     }

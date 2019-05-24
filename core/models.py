@@ -7,7 +7,7 @@ class Gauge(models.Model):
 
 
 class Layout(models.Model):
-    name = models.CharField(max_length=100)
+    key = models.CharField(max_length=100, primary_key=True)
 
 
 class LayoutItem(models.Model):
@@ -16,7 +16,9 @@ class LayoutItem(models.Model):
 
 
 class Display(models.Model):
-    name = models.CharField(max_length=100, null=True)
+    key = models.CharField(max_length=100, primary_key=True)
     available = models.BooleanField(default=False)
     resolution_x = models.IntegerField(default=0)
     resolution_y = models.IntegerField(default=0)
+    current_layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True)
+

@@ -1,9 +1,5 @@
 import * as React from "react";
 import {CreateGlobalStore, GlobalStore} from "./Store";
-import {Hitarea} from "./Hitarea";
-import {Overlay} from "./Overlay";
-import {Controls} from "./Controls";
-
 
 const editorStyle = {
     height: "500px",
@@ -11,10 +7,15 @@ const editorStyle = {
     backgroundColor: "gray"
 };
 
-export class Viewer extends React.Component<{}, {}> {
+
+interface ViewerProps {
+    name: string
+}
+
+export class Viewer extends React.Component<ViewerProps, {}> {
     store: GlobalStore;
 
-    constructor(props: {}) {
+    constructor(props: ViewerProps) {
         super(props);
 
         this.store = CreateGlobalStore();
