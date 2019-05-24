@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from rest_framework import routers
 from rest_framework.urlpatterns import format_suffix_patterns
 
@@ -28,6 +28,10 @@ urlpatterns = [
     path('api/displays/<str:key>/', views.DisplayItem.as_view()),
     path('api/layouts/', views.LayoutList.as_view()),
     path('api/layouts/<str:key>/', views.LayoutItem.as_view()),
+
+    re_path(r'^viewer/.*', views.StaticAssets.as_view()),
+    re_path(r'^editor/(?P<path>.*)', views.StaticAssets.as_view()),
+    path('editor/', views.StaticAssets.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

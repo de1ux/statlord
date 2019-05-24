@@ -1,3 +1,5 @@
+from urllib.request import Request, urlopen
+
 from django.core.serializers import serialize
 
 from django.http import HttpResponse, Http404
@@ -43,6 +45,17 @@ class DisplayList(APIView):
 
 
 class DisplayItem(APIView):
+    def get_object(self, key):
+        try:
+            return Display.objects.get(key=key)
+        except Display.DoesNotExist:
+            raise Http404
+
+    def get(self, request, key, format=None):
+        gauge = self.get_object(key)
+        serializer = DisplaySerializer(gauge)
+        return Response(serializer.data)
+
     def put(self, request, key, format=None):
         display, created = Display.objects.update_or_create(key=key, defaults=({
             'resolution_x': request.data['resolution_x'],
@@ -72,3 +85,10 @@ class LayoutItem(APIView):
         serializer = LayoutSerializer(layout)
         return Response(serializer.data)
 
+
+class StaticAssets(APIView):
+    def get(self, request, path=None, format=None):
+        url = f"http://0.0.0.0:3000/{path}"
+        req = Request(url)
+        res = urlopen(req)
+        return HttpResponse(res.read())

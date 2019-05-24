@@ -29,10 +29,14 @@ export class Viewer extends React.Component<ViewerProps, ViewerState> {
         this.store = CreateGlobalStore();
         this.state = {
             ready: false,
-            width: this.props.width === undefined ? 600 : this.props.width,
-            height: this.props.height === undefined ? 400 : this.props.height,
+            width: this.props.width === undefined ? window.innerWidth : this.props.width,
+            height: this.props.height === undefined ? window.innerHeight : this.props.height,
             name: this.props.name === undefined ? 'test-display' : this.props.name,
         };
+    }
+
+    componentDidMount(): void {
+        console.log(window.location.search.indexOf)
     }
 
     renderSetup() {
