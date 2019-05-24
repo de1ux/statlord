@@ -8,11 +8,7 @@ class Gauge(models.Model):
 
 class Layout(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
-
-
-class LayoutItem(models.Model):
-    parent = models.ForeignKey(Layout, on_delete=models.CASCADE)
-    value = models.ForeignKey(Gauge, on_delete=models.CASCADE)
+    data = models.BinaryField()
 
 
 class Display(models.Model):

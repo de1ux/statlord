@@ -1,9 +1,18 @@
 import * as React from "react";
-import {ControlDroppedMessage, ControlUpdatedMessage, CreateGlobalStore, GlobalStore, State} from "./Store";
+import {
+    AddControlMessage, AddElementMessage,
+    ControlUpdatedMessage,
+    CreateGlobalStore,
+    GlobalStore,
+    State
+} from "./Store";
 import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
 import {Display, Gauge} from "./Models";
-import {Hitarea} from "./Hitarea";
+import {SelectionControls} from "./SelectionControls";
+import {defaultTextProperties} from "./Utiltities";
+
+declare var fabric: any;
 
 interface Element {
     x: number;
@@ -22,78 +31,142 @@ interface OverlayProps {
     display: Display;
 }
 
-export class Overlay extends React.Component<OverlayProps, {}> {
-    elements: Map<String, Element> = new Map();
-    unsubscribe: Unsubscribe;
-    canvasRef: RefObject<HTMLCanvasElement>;
-    ctx: CanvasRenderingContext2D;
+interface OverlayState {
+    selectedControl?: Gauge;
+    selectedObject?: any;
+}
 
-    lastControlDropped: ControlDroppedMessage;
+export class Overlay extends React.Component<OverlayProps, OverlayState> {
+    controls: Map<String, any> = new Map();
+    unsubscribe: Unsubscribe;
+    canvas: any;
+
+    lastAddControl: AddControlMessage;
+    lastAddElement: AddElementMessage;
+
 
     constructor(props: OverlayProps) {
         super(props);
         this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
-        this.canvasRef = React.createRef<HTMLCanvasElement>()
+
+        this.state = {};
     }
 
     onStoreTrigger = () => {
         let state: State = this.props.store.getState();
-        if (state.controlDropped && this.lastControlDropped !== state.controlDropped) {
-            this.controlDropped(state.controlDropped);
-            this.lastControlDropped = state.controlDropped;
+        if (state.addControl && this.lastAddControl !== state.addControl) {
+            this.addControl(state.addControl);
+            this.lastAddControl = state.addControl;
         }
 
         if (state.controlUpdated) {
             this.controlUpdated(state.controlUpdated);
         }
+
+        if (state.addElement && this.lastAddElement !== state.addElement) {
+            this.addElement(state.addElement);
+            this.lastAddElement = state.addElement;
+        }
     };
 
-    controlUpdated(message: ControlUpdatedMessage) {
-        if (!this.elements[message.control.key]) {
-            return
+    addControl(message: AddControlMessage) {
+        if (this.canvas === undefined) {
+            return;
         }
 
-        this.elements[message.control.key].control = message.control;
-        this.draw()
-    }
-
-    // controlDropped occurs when a control is dropped onto the overlay
-    controlDropped(message: ControlDroppedMessage) {
-        this.elements[message.control.key] = {
-            x: message.x,
-            y: message.y,
-            control: message.control,
+        let textProperties = {
+            ...defaultTextProperties(),
+            left: 10,
+            top: 10,
         };
 
-        this.draw();
-    };
+        let text = new fabric.Text(message.control.value, textProperties);
 
-    draw = () => {
-        this.ctx.clearRect(0, 0, 500, 500);
-        this.ctx.fillStyle = 'black';
-        this.ctx.font = '24px sans-serif';
-
-        Object.values(this.elements).map((el: Element) => {
-            this.ctx.fillText(el.control.value, el.x, el.y);
+        text.on('selected', () => {
+            this.setState({
+                selectedControl: message.control,
+                selectedObject: text,
+            })
         });
+        text.on('deselected', () => {
+            this.setState({
+                selectedControl: undefined,
+                selectedObject: undefined,
+            })
+        });
+        text.on('keypress', () => {console.log('asdf')})
 
-        this.ctx.stroke();
-    };
+        this.controls[message.control.key] = text;
+        this.canvas.add(text);
+    }
+
+    addElement(message: AddElementMessage) {
+        if (this.canvas === undefined) {
+            return;
+        }
+
+        switch (message.element) {
+            case "itext":
+                let textProperties = {
+                    ...defaultTextProperties(),
+                    left: 10,
+                    top: 10,
+                };
+
+                let text = new fabric.IText("Text", textProperties);
+                text.on('selected', () => {
+                    this.setState({
+                        selectedControl: undefined,
+                        selectedObject: text,
+                    })
+                });
+                text.on('deselected', () => {
+                    this.setState({
+                        selectedControl: undefined,
+                        selectedObject: undefined,
+                    })
+                });
+                this.canvas.add(text);
+                return;
+            default:
+                alert(`Unrecognized element: ${message.element}`)
+        }
+    }
+
+    controlUpdated(message: ControlUpdatedMessage) {
+        if (this.controls[message.control.key] !== undefined) {
+            this.controls[message.control.key].text = message.control.value;
+
+            this.renderCanvas();
+        }
+    }
 
     componentDidMount(): void {
-        this.ctx = this.canvasRef.current.getContext('2d');
+        this.canvas = new fabric.Canvas("overlay");
     }
 
     componentWillUnmount(): void {
         this.unsubscribe()
     }
 
+    renderCanvas = () => {
+        if (!this.canvas) {
+            return;
+        }
+        this.canvas.renderAll();
+    }
+
     render() {
-        return <div style={overlayStyle}>
-            <Hitarea store={this.props.store} display={this.props.display}/>
-            <canvas width={`${this.props.display.resolution_x}px`} height={`${this.props.display.resolution_y}px`}
-                    ref={this.canvasRef}>
-            </canvas>
+        return <div style={{display: "flex"}}>
+            <div>
+                <canvas id="overlay" width={`${this.props.display.resolution_x}px`}
+                        height={`${this.props.display.resolution_y}px`} style={{border: "1px solid #aaa"}}>
+                </canvas>
+            </div>
+            <div>
+                <SelectionControls object={this.state.selectedObject} selected={this.state.selectedControl}
+                                   renderAll={this.renderCanvas} delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>
+            </div>
         </div>
     }
 }

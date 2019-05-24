@@ -72,9 +72,11 @@
     "@improbable-eng/grpc-web": "^0.9.1",
     "@types/react": "^16.8.17",
     "@types/react-dom": "^16.8.4",
+    "fabric": "^3.0.0",
     "google-protobuf": "^3.7.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-fabricjs": "^0.1.6",
     "redux": "^4.0.1"
   }
 }

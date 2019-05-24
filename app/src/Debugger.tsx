@@ -1,6 +1,5 @@
 import * as React from "react";
 import {CreateGlobalStore, GlobalStore} from "./Store";
-import {Hitarea} from "./Hitarea";
 import {Overlay} from "./Overlay";
 import {Controls} from "./Controls";
 

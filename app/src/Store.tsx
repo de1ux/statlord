@@ -2,35 +2,28 @@ import {createStore, Store} from 'redux';
 import {Gauge} from "./Models";
 
 export const
-    CONTROL_SELECTED = 'CONTROL_SELECTED',
-    CONTROL_DROPPED = 'CONTROL_DROPPED',
-    CONTROL_UPDATED = 'CONTROL_UPDATED',
-    LOCATE_OVERLAY_CONTROL = 'LOCATE_OVERLAY_CONTROL';
+    ADD_CONTROL = 'ADD_CONTROL',
+    ADD_ELEMENT = 'ADD_ELEMENT',
+    CONTROL_UPDATED = 'CONTROL_UPDATED';
 
-export interface ControlSelectedMessage {
-    control: Gauge
-}
 
-export interface ControlDroppedMessage {
+export interface AddControlMessage {
     control: Gauge
-    x: number;
-    y: number;
 }
 
 export interface ControlUpdatedMessage {
     control: Gauge
 }
 
-export interface LocateOverlayControlMessage {
-    x: number
-    y: number
+export interface AddElementMessage {
+    element: string
+    when: number
 }
 
 export interface State {
-    controlDropped: ControlDroppedMessage;
-    controlSelected: ControlSelectedMessage;
+    addElement: AddElementMessage;
+    addControl: AddControlMessage;
     controlUpdated: ControlUpdatedMessage;
-    locateOverlayControl: LocateOverlayControlMessage;
 }
 
 export interface Action extends State {
@@ -39,21 +32,17 @@ export interface Action extends State {
 
 function reducer(state: State, action: Action) {
     switch (action.type) {
-        case CONTROL_DROPPED:
+        case ADD_CONTROL:
             return {
-                ...state, controlDropped: action.controlDropped
-            };
-        case CONTROL_SELECTED:
-            return {
-                ...state, controlSelected: action.controlSelected
+                ...state, addControl: action.addControl
             };
         case CONTROL_UPDATED:
             return {
                 ...state, controlUpdated: action.controlUpdated
             };
-        case LOCATE_OVERLAY_CONTROL:
+        case ADD_ELEMENT:
             return {
-                ...state, locateOverlayControl: action.locateOverlayControl
+                ...state, addElement: action.addElement
             };
         default:
             return state;

@@ -1,6 +1,5 @@
 import * as React from "react";
 import {CONTROL_UPDATED, CreateGlobalStore, GlobalStore} from "./Store";
-import {Hitarea} from "./Hitarea";
 import {Overlay} from "./Overlay";
 import {Controls} from "./Controls";
 import {getAPIEndpoint} from "./Utiltities";
