@@ -9,3 +9,7 @@ export interface Display {
     resolution_x: number;
     resolution_y: number;
 }
+
+export interface Layout {
+    data: any
+}

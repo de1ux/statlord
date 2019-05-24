@@ -1,5 +1,5 @@
 from urllib.request import Request, urlopen
-
+import json
 from django.core.serializers import serialize
 
 from django.http import HttpResponse, Http404
@@ -78,9 +78,20 @@ class LayoutList(APIView):
 
 
 class LayoutItem(APIView):
+    def get_object(self, key):
+        try:
+            return Layout.objects.get(key=key)
+        except Layout.DoesNotExist:
+            raise Http404
+
+    def get(self, request, key, format=None):
+        gauge = self.get_object(key)
+        return Response({'data': bytes(gauge.data).decode()})
+
+
     def put(self, request, key, format=None):
         layout, created = Layout.objects.update_or_create(key=key, defaults=({
-            'data': str(request.data['data']).encode()}))
+            'data': json.dumps(request.data['data']).encode()}))
 
         serializer = LayoutSerializer(layout)
         return Response(serializer.data)

@@ -8,7 +8,7 @@ import {
 } from "./Store";
 import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
-import {Display, Gauge} from "./Models";
+import {Display, Gauge, Layout} from "./Models";
 import {SelectionControls} from "./SelectionControls";
 import {defaultTextProperties, getAPIEndpoint} from "./Utiltities";
 
@@ -29,6 +29,7 @@ const overlayStyle: CSSProperties = {
 interface OverlayProps {
     store: GlobalStore;
     display: Display;
+    layout: Layout;
 }
 
 interface OverlayState {
@@ -64,12 +65,10 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
         fetch(getAPIEndpoint() + "/layouts/default/", {
             method: 'PUT',
-            mode: 'cors',
             body: body,
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'same-origin'
         }).then(data => {
             setTimeout(() => this.setFutureLayout(), 3000);
         })
@@ -118,9 +117,6 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 selectedObject: undefined,
             })
         });
-        text.on('keypress', () => {
-            console.log('asdf')
-        })
 
         this.controls[message.control.key] = text;
         this.canvas.add(text);
@@ -169,6 +165,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
     componentDidMount(): void {
         this.canvas = new fabric.Canvas("overlay");
+
         // add a method to add the "key" property to object output
         this.canvas.toJSONWithKeys = () => {
             let origJSON = this.canvas.toJSON();
@@ -178,6 +175,19 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 return origObjectJSON;
             });
             return origJSON;
+        };
+
+        if (this.props.layout && this.props.layout.data !== "") {
+            let layoutData = JSON.parse(this.props.layout.data);
+            this.canvas.loadFromJSON(layoutData, () => {
+                this.canvas.getObjects().map((object: any) => {
+                    // TODO - this is a jank way of reinitializing controls
+                    if (object.key) {
+                        this.controls[object.key] = object;
+                    }
+                });
+                this.canvas.renderAll();
+            });
         }
     }
 
