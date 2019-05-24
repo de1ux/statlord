@@ -44,7 +44,7 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
     };
 
     render() {
-        if (this.props.selected === undefined) {
+        if (this.props.object === undefined) {
             return <p>Nothing selected</p>
         }
 

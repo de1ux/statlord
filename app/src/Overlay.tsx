@@ -105,21 +105,24 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
         let text = new fabric.Text(message.control.value, textProperties);
 
-        text.on('selected', () => {
-            this.setState({
-                selectedControl: message.control,
-                selectedObject: text,
-            })
-        });
-        text.on('deselected', () => {
-            this.setState({
-                selectedControl: undefined,
-                selectedObject: undefined,
-            })
-        });
+        this.attachTextEventHandlers(text)
 
         this.controls[message.control.key] = text;
         this.canvas.add(text);
+    }
+
+    attachTextEventHandlers(object: any) {
+
+        object.on('selected', () => {
+            this.setState({
+                selectedObject: object,
+            })
+        });
+        object.on('deselected', () => {
+            this.setState({
+                selectedObject: undefined,
+            })
+        });
     }
 
     addElement(message: AddElementMessage) {
@@ -136,18 +139,8 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 };
 
                 let text = new fabric.IText("Text", textProperties);
-                text.on('selected', () => {
-                    this.setState({
-                        selectedControl: undefined,
-                        selectedObject: text,
-                    })
-                });
-                text.on('deselected', () => {
-                    this.setState({
-                        selectedControl: undefined,
-                        selectedObject: undefined,
-                    })
-                });
+                this.attachTextEventHandlers(text);
+
                 this.canvas.add(text);
                 return;
             default:
@@ -185,6 +178,10 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                     if (object.key) {
                         this.controls[object.key] = object;
                     }
+                    if (object.type === 'text' || object.type === 'i-text') {
+                        this.attachTextEventHandlers(object);
+                    }
+
                 });
                 this.canvas.renderAll();
             });
@@ -213,7 +210,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                 </canvas>
             </div>
             <div>
-                <SelectionControls object={this.state.selectedObject} selected={this.state.selectedControl}
+                <SelectionControls object={this.state.selectedObject}
                                    renderAll={this.renderCanvas}
                                    delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>
             </div>
