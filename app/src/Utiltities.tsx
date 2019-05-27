@@ -1,4 +1,4 @@
-import {Layout} from './Models';
+import {Models} from './Models';
 
 export function getAPIEndpoint(): string {
     return "/api"
@@ -21,7 +21,7 @@ export function getLayoutKeyFromURL(): string | null {
     return url.searchParams.get('layout');
 }
 
-export async function getLayout(key?: string): Promise<Layout> {
+export async function getLayout(key?: string): Promise<Models.Layout> {
     if (key === undefined || key === '') {
         key = getLayoutKeyFromURL();
         if (!key) {

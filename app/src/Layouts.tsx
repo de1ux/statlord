@@ -1,20 +1,21 @@
 import * as React from 'react';
 import {Controls} from './Controls';
-import {Display} from './Models';
-import {Overlay} from './Overlay';
+import {Layout} from './Layout';
+import {Models} from './Models';
 import {GlobalStore} from './Store';
 import {getAPIEndpoint} from './Utiltities';
 
 
 interface EditorProps {
     store: GlobalStore;
+    viewOnly: boolean;
 }
 
 interface EditorState {
-    displays: Array<Display>
+    displays: Array<Models.Display>
 }
 
-export class Editor extends React.Component<EditorProps, EditorState> {
+export class Layouts extends React.Component<EditorProps, EditorState> {
     state: EditorState = {
         displays: [],
     };
@@ -24,11 +25,11 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
 
     componentDidMount(): void {
-        this.setFutureDisplaysRefresh()
+        this.setFutureDisplaysRefresh();
     }
 
     setFutureDisplaysRefresh() {
-        fetch(getAPIEndpoint() + "/displays/")
+        fetch(getAPIEndpoint() + '/displays/')
             .then(data => data.json())
             .then((displays) => {
                 this.setState({
@@ -36,13 +37,15 @@ export class Editor extends React.Component<EditorProps, EditorState> {
                 });
 
                 setTimeout(() => this.setFutureDisplaysRefresh(), 3000);
-            })
+            });
     }
 
     mapDisplaysToOverlays = () => {
         let overlays = [];
         for (let display of this.state.displays) {
-            overlays.push(<Overlay store={this.props.store} display={display} viewOnly={false} />);
+            overlays.push(
+                <Layout store={this.props.store} display={display} viewOnly={this.props.viewOnly}/>
+            );
         }
         return overlays;
     };
@@ -52,6 +55,6 @@ export class Editor extends React.Component<EditorProps, EditorState> {
         return <div>
             <Controls store={this.props.store}/>
             {this.mapDisplaysToOverlays()}
-        </div>
+        </div>;
     }
 }

@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {Gauge} from './Models';
+import {Models} from './Models';
 import {defaultTextProperties, TextValues} from './Utiltities';
 
 
 interface SelectionControlsProps {
-    selected?: Gauge
+    selected?: Models.Gauge
     object: any
     renderAll: () => void
     delete: () => void

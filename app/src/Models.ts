@@ -1,16 +1,18 @@
-export interface Gauge {
-    key: string;
-    value: string;
-}
+export namespace Models {
+    export interface Gauge {
+        key: string;
+        value: string;
+    }
 
-export interface Display {
-    key: string;
-    available: boolean;
-    resolution_x: number;
-    resolution_y: number;
-}
+    export interface Display {
+        key: string;
+        available: boolean;
+        resolution_x: number;
+        resolution_y: number;
+    }
 
-export interface Layout {
-    key: string;
-    data: any;
+    export interface Layout {
+        key: string;
+        data: any;
+    }
 }

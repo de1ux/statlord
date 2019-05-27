@@ -1,38 +1,25 @@
 import * as React from 'react';
-import {CSSProperties} from 'react';
 import {Unsubscribe} from 'redux';
-import {Display, Gauge, Layout} from './Models';
+import {Models} from './Models';
 import {SelectionControls} from './SelectionControls';
 import {AddControlMessage, AddElementMessage, ControlUpdatedMessage, GlobalStore, State} from './Store';
 import {defaultTextProperties, getAPIEndpoint, getLayout, getLayoutKeyFromURL} from './Utiltities';
 
 declare var fabric: any;
 
-interface Element {
-    x: number;
-    y: number;
-    control: Gauge;
-}
-
-const overlayStyle: CSSProperties = {
-    position: 'absolute',
-    zIndex: 1,
-    backgroundColor: 'gray'
-};
-
 interface OverlayProps {
     store: GlobalStore;
-    display: Display;
+    display: Models.Display;
     viewOnly: boolean;
 }
 
 interface OverlayState {
     layout?: Layout
-    selectedControl?: Gauge;
+    selectedControl?: Models.Gauge;
     selectedObject?: any;
 }
 
-export class Overlay extends React.Component<OverlayProps, OverlayState> {
+export class Layout extends React.Component<OverlayProps, OverlayState> {
     controls: Map<String, any> = new Map();
     unsubscribe: Unsubscribe;
     canvas: any;
@@ -60,7 +47,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             return;
         }
 
-        getLayout().then((layout: Layout) => {
+        getLayout().then((layout: Models.Layout) => {
             this.renderCanvasFromLayoutData(layout);
             setTimeout(() => this.renderFutureLayout(), 3000);
         }).catch((e) => {
@@ -188,7 +175,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         });
     }
 
-    renderCanvasFromLayoutData(layout: Layout) {
+    renderCanvasFromLayoutData(layout: Models.Layout) {
         let layoutData = JSON.parse(layout.data);
         this.canvas.loadFromJSON(layoutData, () => {
             this.canvas.getObjects().map((object: any) => {

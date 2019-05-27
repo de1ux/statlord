@@ -1,5 +1,5 @@
 import {createStore, Store} from 'redux';
-import {Gauge} from './Models';
+import {Models} from './Models';
 
 export const
     ADD_CONTROL = 'ADD_CONTROL',
@@ -8,11 +8,11 @@ export const
 
 
 export interface AddControlMessage {
-    control: Gauge
+    control: Models.Gauge
 }
 
 export interface ControlUpdatedMessage {
-    control: Gauge
+    control: Models.Gauge
 }
 
 export interface AddElementMessage {

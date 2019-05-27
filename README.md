@@ -1,6 +1,6 @@
 # statlord
 
-> Display realtime data on spare OLEDs, e-paper, LCDs, and even browser windows
+> Display realtime data on spare OLEDs, e-paper, LCDs, and browsers
 
 ## Getting started
 
