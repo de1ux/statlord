@@ -14,12 +14,12 @@ interface OverlayProps {
 }
 
 interface OverlayState {
-    layout?: Layout
+    layout?: Models.Layout
     selectedControl?: Models.Gauge;
     selectedObject?: any;
 }
 
-export class Layout extends React.Component<OverlayProps, OverlayState> {
+export class DisplayEditor extends React.Component<OverlayProps, OverlayState> {
     controls: Map<String, any> = new Map();
     unsubscribe: Unsubscribe;
     canvas: any;

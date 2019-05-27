@@ -1,9 +1,10 @@
 import * as React from 'react';
 import {Controls} from './Controls';
-import {Layout} from './Layout';
+import {DisplayEditor} from './DisplayEditor';
 import {Models} from './Models';
+import {SetupWizard} from './SetupWizard';
 import {GlobalStore} from './Store';
-import {getAPIEndpoint} from './Utiltities';
+import {getAPIEndpoint, getLayoutKeyFromURL} from './Utiltities';
 
 
 interface EditorProps {
@@ -44,16 +45,19 @@ export class Layouts extends React.Component<EditorProps, EditorState> {
         let overlays = [];
         for (let display of this.state.displays) {
             overlays.push(
-                <Layout store={this.props.store} display={display} viewOnly={this.props.viewOnly}/>
+                <DisplayEditor store={this.props.store} display={display} viewOnly={this.props.viewOnly}/>
             );
         }
         return overlays;
     };
 
     render() {
+        if (getLayoutKeyFromURL() === null) {
+            return <SetupWizard/>;
+        }
 
         return <div>
-            <Controls store={this.props.store}/>
+            {this.props.viewOnly ? <div /> : <Controls store={this.props.store}/>}
             {this.mapDisplaysToOverlays()}
         </div>;
     }
