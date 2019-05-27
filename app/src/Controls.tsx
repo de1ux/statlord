@@ -1,7 +1,7 @@
-import * as React from "react";
-import {ADD_CONTROL, ADD_ELEMENT, CONTROL_UPDATED, CreateGlobalStore, GlobalStore} from "./Store";
-import {getAPIEndpoint} from "./Utiltities";
-import {Gauge} from "./Models";
+import * as React from 'react';
+import {Gauge} from './Models';
+import {ADD_CONTROL, ADD_ELEMENT, CONTROL_UPDATED, GlobalStore} from './Store';
+import {getAPIEndpoint} from './Utiltities';
 
 interface ControlsProps {
     store: GlobalStore

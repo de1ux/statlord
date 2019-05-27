@@ -1,16 +1,10 @@
-import * as React from "react";
-import {
-    AddControlMessage, AddElementMessage,
-    ControlUpdatedMessage,
-    CreateGlobalStore,
-    GlobalStore,
-    State
-} from "./Store";
-import {Unsubscribe} from "redux";
-import {CSSProperties, RefObject} from "react";
-import {Display, Gauge, Layout} from "./Models";
-import {SelectionControls} from "./SelectionControls";
-import {defaultTextProperties, getAPIEndpoint, getLayout, getLayoutKeyFromURL} from "./Utiltities";
+import * as React from 'react';
+import {CSSProperties} from 'react';
+import {Unsubscribe} from 'redux';
+import {Display, Gauge, Layout} from './Models';
+import {SelectionControls} from './SelectionControls';
+import {AddControlMessage, AddElementMessage, ControlUpdatedMessage, GlobalStore, State} from './Store';
+import {defaultTextProperties, getAPIEndpoint, getLayout, getLayoutKeyFromURL} from './Utiltities';
 
 declare var fabric: any;
 
@@ -23,7 +17,7 @@ interface Element {
 const overlayStyle: CSSProperties = {
     position: 'absolute',
     zIndex: 1,
-    backgroundColor: "gray"
+    backgroundColor: 'gray'
 };
 
 interface OverlayProps {
@@ -69,7 +63,9 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         getLayout().then((layout: Layout) => {
             this.renderCanvasFromLayoutData(layout);
             setTimeout(() => this.renderFutureLayout(), 3000);
-        })
+        }).catch((e) => {
+
+        });
     }
 
     setFutureLayout() {
@@ -80,7 +76,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
         let body = JSON.stringify({'data': this.canvas.toJSONWithKeys()});
 
-        fetch(getAPIEndpoint() + "/layouts/" + getLayoutKeyFromURL() + "/", {
+        fetch(getAPIEndpoint() + '/layouts/' + getLayoutKeyFromURL() + '/', {
             method: 'PUT',
             body: body,
             headers: {
@@ -88,7 +84,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             },
         }).then(data => {
             setTimeout(() => this.setFutureLayout(), 3000);
-        })
+        });
     }
 
     onStoreTrigger = () => {
@@ -122,7 +118,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
         let text = new fabric.Text(message.control.value, textProperties);
 
-        this.attachTextEventHandlers(text)
+        this.attachTextEventHandlers(text);
 
         this.controls[message.control.key] = text;
         this.canvas.add(text);
@@ -133,12 +129,12 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         object.on('selected', () => {
             this.setState({
                 selectedObject: object,
-            })
+            });
         });
         object.on('deselected', () => {
             this.setState({
                 selectedObject: undefined,
-            })
+            });
         });
     }
 
@@ -148,20 +144,20 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         }
 
         switch (message.element) {
-            case "itext":
+            case 'itext':
                 let textProperties = {
                     ...defaultTextProperties(),
                     left: 10,
                     top: 10,
                 };
 
-                let text = new fabric.IText("Text", textProperties);
+                let text = new fabric.IText('Text', textProperties);
                 this.attachTextEventHandlers(text);
 
                 this.canvas.add(text);
                 return;
             default:
-                alert(`Unrecognized element: ${message.element}`)
+                alert(`Unrecognized element: ${message.element}`);
         }
     }
 
@@ -174,7 +170,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
     }
 
     componentDidMount(): void {
-        this.canvas = new fabric.Canvas("overlay");
+        this.canvas = new fabric.Canvas('overlay');
 
         // add a method to add the "key" property to object output
         this.canvas.toJSONWithKeys = () => {
@@ -210,7 +206,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
     }
 
     componentWillUnmount(): void {
-        this.unsubscribe()
+        this.unsubscribe();
     }
 
     renderCanvas = () => {
@@ -221,10 +217,10 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
     };
 
     render() {
-        return <div style={{display: "flex"}}>
+        return <div style={{display: 'flex'}}>
             <div>
                 <canvas id="overlay" width={`${this.props.display.resolution_x}px`}
-                        height={`${this.props.display.resolution_y}px`} style={{border: "1px solid #aaa"}}>
+                        height={`${this.props.display.resolution_y}px`} style={{border: '1px solid #aaa'}}>
                 </canvas>
             </div>
             <div>
@@ -232,6 +228,6 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
                                                                    renderAll={this.renderCanvas}
                                                                    delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>}
             </div>
-        </div>
+        </div>;
     }
 }

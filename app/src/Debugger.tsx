@@ -1,7 +1,5 @@
-import * as React from "react";
-import {CreateGlobalStore, GlobalStore} from "./Store";
-import {Overlay} from "./Overlay";
-import {Controls} from "./Controls";
+import * as React from 'react';
+import {CreateGlobalStore, GlobalStore} from './Store';
 
 
 const editorStyle = {

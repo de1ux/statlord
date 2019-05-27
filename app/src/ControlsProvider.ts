@@ -1,5 +1,5 @@
-import {getAPIEndpoint} from "./Utiltities";
-import {CONTROL_UPDATED, GlobalStore} from "./Store";
+import {CONTROL_UPDATED, GlobalStore} from './Store';
+import {getAPIEndpoint} from './Utiltities';
 
 export class ControlsProvider {
     private store: GlobalStore;

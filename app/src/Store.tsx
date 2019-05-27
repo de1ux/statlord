@@ -1,5 +1,5 @@
 import {createStore, Store} from 'redux';
-import {Gauge} from "./Models";
+import {Gauge} from './Models';
 
 export const
     ADD_CONTROL = 'ADD_CONTROL',

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import time
-import requests
 from random import randint
+
+import requests
 
 
 def main():

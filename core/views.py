@@ -1,14 +1,13 @@
-from urllib.request import Request, urlopen
 import json
-from django.core.serializers import serialize
+from urllib.request import Request, urlopen
 
-from django.http import HttpResponse, Http404
-from rest_framework import viewsets, status
+from django.http import Http404, HttpResponse
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Gauge, Display, Layout
-from core.serializers import GaugeSerializer, DisplaySerializer, LayoutSerializer
+from core.models import Display, Gauge, Layout
+from core.serializers import DisplaySerializer, GaugeSerializer, LayoutSerializer
 
 
 class GaugeList(APIView):

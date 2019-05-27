@@ -1,9 +1,6 @@
-import * as React from "react";
-import {CONTROL_UPDATED, CreateGlobalStore, GlobalStore} from "./Store";
-import {Overlay} from "./Overlay";
-import {Controls} from "./Controls";
-import {defaultTextProperties, getAPIEndpoint, TextValues} from "./Utiltities";
-import {Display, Gauge} from "./Models";
+import * as React from 'react';
+import {Gauge} from './Models';
+import {defaultTextProperties, TextValues} from './Utiltities';
 
 
 interface SelectionControlsProps {

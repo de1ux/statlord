@@ -1,4 +1,4 @@
-import {Layout} from "./Models";
+import {Layout} from './Models';
 
 export function getAPIEndpoint(): string {
     return "/api"
@@ -25,18 +25,18 @@ export async function getLayout(key?: string): Promise<Layout> {
     if (key === undefined || key === '') {
         key = getLayoutKeyFromURL();
         if (!key) {
-            return Promise.resolve(undefined);
+            return Promise.reject("No layout key specified");
         }
     }
 
     return fetch(getAPIEndpoint() + "/layouts/" + key)
         .then(data => {
             if (data.status !== 200) {
-                return Promise.resolve(undefined);
+                return Promise.reject("No layout");
             }
             return data.json();
         })
         .catch((e) => {
-            return Promise.resolve(undefined);
+            return Promise.reject("No layout");
         });
 }
