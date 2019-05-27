@@ -4,7 +4,7 @@ import {DisplayEditor} from './DisplayEditor';
 import {Models} from './Models';
 import {SetupWizard} from './SetupWizard';
 import {GlobalStore} from './Store';
-import {getAPIEndpoint, getLayoutKeyFromURL} from './Utiltities';
+import {getAPIEndpoint, getKeyFromURL} from './Utiltities';
 
 
 interface EditorProps {
@@ -52,7 +52,7 @@ export class Layouts extends React.Component<EditorProps, EditorState> {
     };
 
     render() {
-        if (getLayoutKeyFromURL() === null) {
+        if (getKeyFromURL() === null) {
             return <SetupWizard/>;
         }
 

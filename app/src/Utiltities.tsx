@@ -16,16 +16,16 @@ export function defaultTextProperties(): TextValues {
     }
 }
 
-export function getLayoutKeyFromURL(): string | null {
+export function getKeyFromURL(): string | null {
     let url = new URL(window.location.href);
-    return url.searchParams.get('layout');
+    return url.searchParams.get('key');
 }
 
 export async function getLayout(key?: string): Promise<Models.Layout> {
     if (key === undefined || key === '') {
-        key = getLayoutKeyFromURL();
+        key = getKeyFromURL();
         if (!key) {
-            return Promise.reject("No layout key specified");
+            return Promise.reject("No key specified");
         }
     }
 

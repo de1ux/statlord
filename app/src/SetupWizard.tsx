@@ -112,7 +112,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                     <h2>Layouts</h2>
                     <ul>
                         {this.state.layouts.map((layout) => {
-                            return <li key={layout.key}>{layout.key} (<a href={"/editor/?layout=" + layout.key}>editor</a> | <a href={"/viewer/?layout=" + layout.key}>viewer</a>)</li>;
+                            return <li key={layout.key}>{layout.key} (<a href={"/editor/?key=" + layout.key}>editor</a>)</li>;
                         })}
                     </ul>
                     <div>
@@ -134,7 +134,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                     <h2>Displays</h2>
                     <ul>
                         {this.state.displays.map((display) => {
-                            return <li key={display.key}>{display.key}</li>;
+                            return <li key={display.key}>{display.key} (<a href={"/viewer/?key=" + display.key}>viewer</a>)</li>;
                         })}
                     </ul>
                     <div>

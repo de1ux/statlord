@@ -3,7 +3,7 @@ import {Unsubscribe} from 'redux';
 import {Models} from './Models';
 import {SelectionControls} from './SelectionControls';
 import {AddControlMessage, AddElementMessage, ControlUpdatedMessage, GlobalStore, State} from './Store';
-import {defaultTextProperties, getAPIEndpoint, getLayout, getLayoutKeyFromURL} from './Utiltities';
+import {defaultTextProperties, getAPIEndpoint, getLayout, getKeyFromURL} from './Utiltities';
 
 declare var fabric: any;
 
@@ -63,7 +63,7 @@ export class DisplayEditor extends React.Component<OverlayProps, OverlayState> {
 
         let body = JSON.stringify({'data': this.canvas.toJSONWithKeys()});
 
-        fetch(getAPIEndpoint() + '/layouts/' + getLayoutKeyFromURL() + '/', {
+        fetch(getAPIEndpoint() + '/layouts/' + getKeyFromURL() + '/', {
             method: 'PUT',
             body: body,
             headers: {
