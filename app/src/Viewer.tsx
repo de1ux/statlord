@@ -5,39 +5,24 @@ import {Controls} from "./Controls";
 import {getAPIEndpoint, getLayout} from "./Utiltities";
 import {Display, Layout} from "./Models";
 
+interface ViewerProps {
+    store: GlobalStore;
+}
 
 interface ViewerState {
     displays: Array<Display>
-    layout?: Layout;
 }
 
-export class Viewer extends React.Component<{}, ViewerState> {
+export class Viewer extends React.Component<ViewerProps, ViewerState> {
     state: ViewerState = {
         displays: [],
     };
-    store: GlobalStore;
 
-    constructor(props: {}) {
+    constructor(props: ViewerProps) {
         super(props);
-
-        this.store = CreateGlobalStore();
     }
 
     componentDidMount(): void {
-        getLayout().then((layout: Layout) => {
-            if (layout === undefined) {
-                fetch(getAPIEndpoint() + "/layouts/default/", {
-                    method: 'PUT',
-                    body: "",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                }).then(data => {
-                    this.setState({layout: {data: ""}})
-                })
-            }
-            this.setState({layout: layout})
-        });
         this.setFutureDisplaysRefresh()
     }
 
@@ -56,17 +41,14 @@ export class Viewer extends React.Component<{}, ViewerState> {
     mapDisplaysToOverlays = () => {
         let overlays = [];
         for (let display of this.state.displays) {
-            overlays.push(<Overlay store={this.store} display={display} layout={this.state.layout} viewOnly />);
+            overlays.push(<Overlay store={this.props.store} display={display} viewOnly/>);
         }
         return overlays;
     };
 
     render() {
-        if (!this.state.layout) {
-            return "Awaiting layout..."
-        }
-
         return <div>
+            <h1>Viewer</h1>
             {this.mapDisplaysToOverlays()}
         </div>
     }

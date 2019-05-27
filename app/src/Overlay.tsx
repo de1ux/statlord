@@ -10,7 +10,7 @@ import {Unsubscribe} from "redux";
 import {CSSProperties, RefObject} from "react";
 import {Display, Gauge, Layout} from "./Models";
 import {SelectionControls} from "./SelectionControls";
-import {defaultTextProperties, getAPIEndpoint} from "./Utiltities";
+import {defaultTextProperties, getAPIEndpoint, getLayout, getLayoutKeyFromURL} from "./Utiltities";
 
 declare var fabric: any;
 
@@ -29,11 +29,11 @@ const overlayStyle: CSSProperties = {
 interface OverlayProps {
     store: GlobalStore;
     display: Display;
-    layout: Layout;
     viewOnly: boolean;
 }
 
 interface OverlayState {
+    layout?: Layout
     selectedControl?: Gauge;
     selectedObject?: any;
 }
@@ -51,9 +51,25 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
         super(props);
         this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
 
-        this.state = {};
+        if (this.props.viewOnly) {
+            this.renderFutureLayout();
+        } else {
+            this.setFutureLayout();
+        }
 
-        this.setFutureLayout();
+        this.state = {};
+    }
+
+    renderFutureLayout() {
+        if (this.canvas === undefined) {
+            setTimeout(() => this.renderFutureLayout(), 3000);
+            return;
+        }
+
+        getLayout().then((layout: Layout) => {
+            this.renderCanvasFromLayoutData(layout);
+            setTimeout(() => this.renderFutureLayout(), 3000);
+        })
     }
 
     setFutureLayout() {
@@ -64,7 +80,7 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
 
         let body = JSON.stringify({'data': this.canvas.toJSONWithKeys()});
 
-        fetch(getAPIEndpoint() + "/layouts/default/", {
+        fetch(getAPIEndpoint() + "/layouts/" + getLayoutKeyFromURL() + "/", {
             method: 'PUT',
             body: body,
             headers: {
@@ -171,22 +187,26 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
             return origJSON;
         };
 
-        if (this.props.layout && this.props.layout.data !== "") {
-            let layoutData = JSON.parse(this.props.layout.data);
-            this.canvas.loadFromJSON(layoutData, () => {
-                this.canvas.getObjects().map((object: any) => {
-                    // TODO - this is a jank way of reinitializing controls
-                    if (object.key) {
-                        this.controls[object.key] = object;
-                    }
-                    if (object.type === 'text' || object.type === 'i-text') {
-                        this.attachTextEventHandlers(object);
-                    }
+        getLayout().then((layout) => {
+            this.renderCanvasFromLayoutData(layout);
+        });
+    }
 
-                });
-                this.canvas.renderAll();
+    renderCanvasFromLayoutData(layout: Layout) {
+        let layoutData = JSON.parse(layout.data);
+        this.canvas.loadFromJSON(layoutData, () => {
+            this.canvas.getObjects().map((object: any) => {
+                // TODO - this is a jank way of reinitializing controls
+                if (object.key) {
+                    this.controls[object.key] = object;
+                }
+                if (object.type === 'text' || object.type === 'i-text') {
+                    this.attachTextEventHandlers(object);
+                }
+
             });
-        }
+            this.canvas.renderAll();
+        });
     }
 
     componentWillUnmount(): void {
@@ -203,17 +223,14 @@ export class Overlay extends React.Component<OverlayProps, OverlayState> {
     render() {
         return <div style={{display: "flex"}}>
             <div>
-                <button onClick={(e) => console.log(this.canvas.toJSONWithKeys())}>toJSON</button>
-            </div>
-            <div>
                 <canvas id="overlay" width={`${this.props.display.resolution_x}px`}
                         height={`${this.props.display.resolution_y}px`} style={{border: "1px solid #aaa"}}>
                 </canvas>
             </div>
             <div>
-                {this.props.viewOnly ? <div /> : <SelectionControls object={this.state.selectedObject}
-                                   renderAll={this.renderCanvas}
-                                   delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>}
+                {this.props.viewOnly ? <div/> : <SelectionControls object={this.state.selectedObject}
+                                                                   renderAll={this.renderCanvas}
+                                                                   delete={() => this.canvas.remove(this.canvas.getActiveObject())}/>}
             </div>
         </div>
     }

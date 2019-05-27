@@ -29,9 +29,11 @@ urlpatterns = [
     path('api/layouts/', views.LayoutList.as_view()),
     path('api/layouts/<str:key>/', views.LayoutItem.as_view()),
 
-    re_path(r'^viewer/.*', views.StaticAssets.as_view()),
+    re_path(r'^viewer/(?P<path>.*)', views.StaticAssets.as_view()),
+    path('viewer/', views.StaticAssets.as_view()),
     re_path(r'^editor/(?P<path>.*)', views.StaticAssets.as_view()),
     path('editor/', views.StaticAssets.as_view()),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -18,3 +18,9 @@ class LayoutSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Layout
         fields = ('key', 'data')
+
+
+class LayoutSerializer(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = models.Layout
+        fields = ('key', 'data')

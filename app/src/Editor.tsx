@@ -6,38 +6,24 @@ import {getAPIEndpoint, getLayout} from "./Utiltities";
 import {Display, Layout} from "./Models";
 
 
-interface EditorState {
-    displays: Array<Display>
-    layout?: Layout;
+interface EditorProps {
+    store: GlobalStore;
 }
 
-export class Editor extends React.Component<{}, EditorState> {
+interface EditorState {
+    displays: Array<Display>
+}
+
+export class Editor extends React.Component<EditorProps, EditorState> {
     state: EditorState = {
         displays: [],
     };
-    store: GlobalStore;
 
-    constructor(props: {}) {
+    constructor(props: EditorProps) {
         super(props);
-
-        this.store = CreateGlobalStore();
     }
 
     componentDidMount(): void {
-        getLayout().then((layout: Layout) => {
-            if (layout === undefined) {
-                fetch(getAPIEndpoint() + "/layouts/default/", {
-                    method: 'PUT',
-                    body: "",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                }).then(data => {
-                    this.setState({layout: {data: ""}})
-                })
-            }
-            this.setState({layout: layout})
-        });
         this.setFutureDisplaysRefresh()
     }
 
@@ -56,18 +42,15 @@ export class Editor extends React.Component<{}, EditorState> {
     mapDisplaysToOverlays = () => {
         let overlays = [];
         for (let display of this.state.displays) {
-            overlays.push(<Overlay store={this.store} display={display} layout={this.state.layout} viewOnly={false} />);
+            overlays.push(<Overlay store={this.props.store} display={display} viewOnly={false} />);
         }
         return overlays;
     };
 
     render() {
-        if (!this.state.layout) {
-            return "Awaiting layout..."
-        }
 
         return <div>
-            <Controls store={this.store}/>
+            <Controls store={this.props.store}/>
             {this.mapDisplaysToOverlays()}
         </div>
     }

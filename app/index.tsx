@@ -2,15 +2,22 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {Editor} from "./src/Editor";
 import {Viewer} from "./src/Viewer";
+import {ControlsProvider} from "./src/ControlsProvider";
+import {CreateGlobalStore} from "./src/Store";
 
-if (window.location.search.indexOf("viewer=true") === -1) {
+let store = CreateGlobalStore();
+
+// Providers
+new ControlsProvider(store);
+
+if (window.location.href.indexOf("viewer") === -1) {
     ReactDOM.render(
-        <Editor/>,
+        <Editor store={store}/>,
         document.getElementById('root')
     );
 } else {
     ReactDOM.render(
-        <Viewer />,
+        <Viewer store={store}/>,
         document.getElementById('root')
     );
 }

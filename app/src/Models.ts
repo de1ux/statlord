@@ -11,5 +11,6 @@ export interface Display {
 }
 
 export interface Layout {
-    data: any
+    key: string;
+    data: any;
 }

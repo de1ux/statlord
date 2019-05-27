@@ -16,13 +16,20 @@ export function defaultTextProperties(): TextValues {
     }
 }
 
-export async function getLayout(): Promise<Layout> {
+export function getLayoutKeyFromURL(): string | null {
     let url = new URL(window.location.href);
-    let layout = url.searchParams.get('layout');
-    if (!layout) {
-        return Promise.resolve(undefined);
+    return url.searchParams.get('layout');
+}
+
+export async function getLayout(key?: string): Promise<Layout> {
+    if (key === undefined || key === '') {
+        key = getLayoutKeyFromURL();
+        if (!key) {
+            return Promise.resolve(undefined);
+        }
     }
-    return fetch(getAPIEndpoint() + "/layouts/" + layout)
+
+    return fetch(getAPIEndpoint() + "/layouts/" + key)
         .then(data => {
             if (data.status !== 200) {
                 return Promise.resolve(undefined);

@@ -86,7 +86,7 @@ class LayoutItem(APIView):
 
     def get(self, request, key, format=None):
         gauge = self.get_object(key)
-        return Response({'data': bytes(gauge.data).decode()})
+        return Response({'data': bytes(gauge.data).decode(), 'key': key})
 
 
     def put(self, request, key, format=None):
