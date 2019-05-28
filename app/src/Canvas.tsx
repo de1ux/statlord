@@ -2,8 +2,10 @@ import * as React from "react";
 import {Models} from "./Models";
 import {
     ControlAddedMessage,
-    ControlUpdatedMessage, ElementAddedMessage,
+    ControlUpdatedMessage,
+    ElementAddedMessage,
     GlobalStore,
+    RequestCanvasDeleteObjectMessage,
     RequestCanvasRenderMessage,
     State,
     UPDATE_SELECTED_OBJECT
@@ -27,6 +29,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     canvas: any;
     controls: Map<String, any> = new Map();
     lastRerender: RequestCanvasRenderMessage;
+    lastDeleteObject: RequestCanvasDeleteObjectMessage;
     lastControlUpdated: ControlUpdatedMessage;
     lastAddControl: ControlAddedMessage;
     lastAddElement: any;
@@ -46,19 +49,24 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             this.canvas.renderAll();
         }
 
+        if (state.requestCanvasDeleteObject && this.lastDeleteObject !== state.requestCanvasDeleteObject) {
+            this.lastDeleteObject = state.requestCanvasDeleteObject;
+            this.canvas.remove(this.canvas.getActiveObject())
+        }
+
         if (state.controlUpdated && this.lastControlUpdated !== state.controlUpdated) {
             this.lastControlUpdated = state.controlUpdated;
             this.controlUpdated(state.controlUpdated);
         }
 
         if (state.elementAdded && this.lastAddElement !== state.elementAdded) {
-            this.addElement(state.elementAdded);
             this.lastAddElement = state.elementAdded;
+            this.addElement(state.elementAdded);
         }
 
         if (state.controlAdded && this.lastAddControl !== state.controlAdded) {
-            this.addControl(state.controlAdded);
             this.lastAddControl = state.controlAdded;
+            this.addControl(state.controlAdded);
         }
     };
 

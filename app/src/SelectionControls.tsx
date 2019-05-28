@@ -87,7 +87,8 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
 
                 <button onClick={(e) => this.props.store.dispatch({
                     type: REQUEST_CANVAS_DELETE_OBJECT,
-                    requestCanvasDeleteObject: {when: (new Date).getTime()}
+                    requestCanvasDeleteObject: {
+                        when: (new Date).getTime()}
                 })}>Delete
                 </button>
             </p>
