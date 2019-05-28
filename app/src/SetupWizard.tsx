@@ -134,7 +134,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                     <h2>Displays</h2>
                     <ul>
                         {this.state.displays.map((display) => {
-                            return <li key={display.key}>{display.key} (<a href={"/viewer/?key=" + display.key}>viewer</a>)</li>;
+                            return <li key={display.key}>{display.key}</li>;
                         })}
                     </ul>
                     <div>

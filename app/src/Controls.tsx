@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {Models} from './Models';
-import {ADD_CONTROL, ADD_ELEMENT, CONTROL_UPDATED, GlobalStore} from './Store';
+import {CONTROL_ADDED, CONTROL_UPDATED, ELEMENT_ADDED, GlobalStore} from './Store';
 import {getAPIEndpoint} from './Utiltities';
 
 interface ControlsProps {
@@ -49,8 +49,8 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
     addControl = (gauge: Models.Gauge) => (e: React.MouseEvent) => {
         e.preventDefault();
         this.props.store.dispatch({
-            type: ADD_CONTROL,
-            addControl: {
+            type: CONTROL_ADDED,
+            controlAdded: {
                 control: gauge,
             },
         });
@@ -59,13 +59,13 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
     addItext = (e: React.MouseEvent) => {
         e.preventDefault();
         this.props.store.dispatch({
-            type: ADD_ELEMENT,
-            addElement: {
+            type: ELEMENT_ADDED,
+            elementAdded: {
                 element: 'itext',
                 when: (new Date).getTime()
             }
         })
-    }
+    };
 
     renderControls = () => {
         return this.state.guages.map((gauge: Models.Gauge) =>
@@ -96,7 +96,9 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
                 <tr>
                     <td>Insert text</td>
                     <td></td>
-                    <td><button onClick={this.addItext}>Add</button></td>
+                    <td>
+                        <button onClick={this.addItext}>Add</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
