@@ -8,6 +8,7 @@ class Gauge(models.Model):
 
 class Layout(models.Model):
     key = models.CharField(max_length=100, primary_key=True)
+    display_positions = models.TextField(default='')
     data = models.BinaryField()
 
 

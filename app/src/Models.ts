@@ -14,5 +14,6 @@ export namespace Models {
     export interface Layout {
         key: string;
         data: any;
+        display_positions: string;
     }
 }

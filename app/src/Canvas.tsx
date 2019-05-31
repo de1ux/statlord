@@ -1,5 +1,5 @@
-import * as React from "react";
-import {Models} from "./Models";
+import * as React from 'react';
+import {Models} from './Models';
 import {
     ControlAddedMessage,
     ControlUpdatedMessage,
@@ -9,9 +9,9 @@ import {
     RequestCanvasRenderMessage,
     State,
     UPDATE_SELECTED_OBJECT
-} from "./Store";
-import {defaultTextProperties, getAPIEndpoint, getKeyFromURL} from "./Utiltities";
-import {Unsubscribe} from "redux";
+} from './Store';
+import {defaultTextProperties, getAPIEndpoint, getKeyFromURL} from './Utiltities';
+import {Unsubscribe} from 'redux';
 
 declare var fabric: any;
 
@@ -28,6 +28,7 @@ interface CanvasState {
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
     canvas: any;
     controls: Map<String, any> = new Map();
+    displays: Map<String, Array<Number>> = new Map();
     lastRerender: RequestCanvasRenderMessage;
     lastDeleteObject: RequestCanvasDeleteObjectMessage;
     lastControlUpdated: ControlUpdatedMessage;
@@ -51,7 +52,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         if (state.requestCanvasDeleteObject && this.lastDeleteObject !== state.requestCanvasDeleteObject) {
             this.lastDeleteObject = state.requestCanvasDeleteObject;
-            this.canvas.remove(this.canvas.getActiveObject())
+            this.canvas.remove(this.canvas.getActiveObject());
         }
 
         if (state.controlUpdated && this.lastControlUpdated !== state.controlUpdated) {
@@ -84,11 +85,14 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     writeFutureLayout() {
         if (this.canvas === undefined) {
-            setTimeout(() => this.writeFutureLayout(), 3000);
+            setTimeout(() => this.writeFutureLayout(), 1000);
             return;
         }
 
-        let body = JSON.stringify({'data': this.canvas.toJSONWithKeys()});
+        let body = JSON.stringify({
+            'data': this.canvas.toJSONWithKeys(),
+            'display_positions': JSON.stringify(this.displays),
+        });
 
         fetch(getAPIEndpoint() + '/layouts/' + getKeyFromURL() + '/', {
             method: 'PUT',
@@ -97,7 +101,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 'Content-Type': 'application/json'
             },
         }).then(data => {
-            setTimeout(() => this.writeFutureLayout(), 3000);
+            setTimeout(() => this.writeFutureLayout(), 1000);
         });
     }
 
@@ -113,9 +117,65 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                     this.attachTextEventHandlers(object);
                 }
 
+                if (object.type === 'rect') {
+                    this.canvas.remove(object);
+                }
+
             });
             this.canvas.renderAll();
         });
+
+        if (layout.display_positions === '') {
+            this.renderDisplayBoundaries(this.props.displays);
+        } else {
+            this.renderDisplayBoundaries(this.props.displays, JSON.parse(layout.display_positions));
+        }
+    }
+
+    renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<Number>>) {
+
+        let offsetLeft = 0;
+        for (let display of displays) {
+            let rect = new fabric.Rect(),
+                left = offsetLeft,
+                top = 0;
+
+            if (displayPositions) {
+                left = displayPositions[display.key][0];
+                top = displayPositions[display.key][1];
+            }
+
+            rect.set({
+                width: display.resolution_x,
+                height: display.resolution_y,
+                fill: 'gray',
+                opacity: 0.1,
+                top: top,
+                left: left,
+            });
+
+            // disable resizing
+            rect.setControlsVisibility({
+                mt: false,
+                mb: false,
+                ml: false,
+                mr: false,
+                bl: false,
+                br: false,
+                tl: false,
+                tr: false,
+                mtr: false,
+            });
+            rect.key = display.key;
+
+            this.attatchDisplayEventHandlers(rect);
+            this.attachTextEventHandlers(rect);
+            this.canvas.add(rect);
+
+            this.displays[display.key] = [left, top];
+
+            offsetLeft += display.resolution_x;
+        }
     }
 
     addControl(message: ControlAddedMessage) {
@@ -153,7 +213,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 updateSelectedObject: {
                     object: object,
                 },
-            })
+            });
         });
         object.on('deselected', () => {
             this.props.store.dispatch({
@@ -161,7 +221,13 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 updateSelectedObject: {
                     object: undefined,
                 },
-            })
+            });
+        });
+    }
+
+    attatchDisplayEventHandlers(object: any) {
+        object.on('moved', () => {
+            this.displays[object.key] = [object.left, object.top];
         });
     }
 
@@ -218,7 +284,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                        width={`${this.largestDimension}px`}
                        height={`${this.largestDimension}px`}
                        style={{border: '1px solid #aaa'}}>
-        </canvas>
+        </canvas>;
     }
 }
 

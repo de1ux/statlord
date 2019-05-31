@@ -30,6 +30,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
             newLayout: {
                 key: 'default',
                 data: '',
+                display_positions: '',
             },
             newDisplay: {
                 key: 'browser-a',
