@@ -59,6 +59,7 @@ class DisplayItem(APIView):
         display, created = Display.objects.update_or_create(key=key, defaults=({
             'resolution_x': request.data['resolution_x'],
             'resolution_y': request.data['resolution_y'],
+            'display_data': request.data['display_data'],
             'available': True}))
 
         serializer = DisplaySerializer(display, data=request.data)

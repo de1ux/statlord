@@ -18,4 +18,5 @@ class Display(models.Model):
     resolution_x = models.IntegerField(default=0)
     resolution_y = models.IntegerField(default=0)
     current_layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True)
+    display_data = models.TextField(default='')
 

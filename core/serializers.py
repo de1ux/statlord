@@ -12,16 +12,11 @@ class GaugeSerializer(serializers.HyperlinkedModelSerializer):
 class DisplaySerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Display
-        fields = ('key', 'available', 'resolution_x', 'resolution_y', 'current_layout',)
-
-
-class LayoutSerializer(serializers.HyperlinkedModelSerializer):
-    class Meta:
-        model = models.Layout
-        fields = ('key', 'data')
+        fields = ('key', 'available', 'resolution_x', 'resolution_y', 'current_layout', 'display_data',)
 
 
 class LayoutSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = models.Layout
         fields = ('key', 'data', 'display_positions')
+

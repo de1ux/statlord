@@ -10,8 +10,9 @@ import {
     State,
     UPDATE_SELECTED_OBJECT
 } from './Store';
-import {defaultTextProperties, getAPIEndpoint, getKeyFromURL} from './Utiltities';
+import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, isEmpty, isWorker} from './Utiltities';
 import {Unsubscribe} from 'redux';
+import set = Reflect.set;
 
 declare var fabric: any;
 
@@ -40,7 +41,12 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         super(props);
 
         this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
-        this.writeFutureLayout();
+
+        if (isWorker()) {
+            this.writeFutureCanvasData();
+        } else {
+            this.writeFutureLayout();
+        }
     }
 
     onStoreTrigger = () => {
@@ -83,6 +89,34 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         return width > height ? width : height;
     }
 
+    async writeFutureCanvasData() {
+        if (this.canvas === undefined) {
+            setTimeout(() => this.writeFutureCanvasData(), 5000);
+            return;
+        }
+
+        this.displays.forEach(async (position: Array<number>, key: string) => {
+            let display = this.props.displays.find((display: Models.Display) => display.key === key),
+                x = position[0],
+                y = position[1],
+                w = display.resolution_x,
+                h = display.resolution_y;
+
+            let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
+            display.display_data = JSON.stringify(displayCanvasData.data);
+
+            await fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
+                method: 'PUT',
+                body: JSON.stringify(display),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+            })
+        });
+
+        setTimeout(() => this.writeFutureCanvasData(), 5000);
+    }
+
     writeFutureLayout() {
         if (this.canvas === undefined) {
             setTimeout(() => this.writeFutureLayout(), 1000);
@@ -91,7 +125,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         let body = JSON.stringify({
             'data': this.canvas.toJSONWithKeys(),
-            'display_positions': JSON.stringify(this.displays),
+            'display_positions': JSON.stringify([...this.displays]),
         });
 
         fetch(getAPIEndpoint() + '/layouts/' + getKeyFromURL() + '/', {
@@ -101,7 +135,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 'Content-Type': 'application/json'
             },
         }).then(data => {
-            setTimeout(() => this.writeFutureLayout(), 1000);
+            setTimeout(() => this.writeFutureLayout(), 5000);
         });
     }
 
@@ -111,7 +145,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             this.canvas.getObjects().map((object: any) => {
                 // TODO - this is a jank way of reinitializing controls
                 if (object.key) {
-                    this.controls[object.key] = object;
+                    this.controls.set(object.key, object);
                 }
                 if (object.type === 'text' || object.type === 'i-text') {
                     this.attachTextEventHandlers(object);
@@ -128,11 +162,11 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         if (layout.display_positions === '') {
             this.renderDisplayBoundaries(this.props.displays);
         } else {
-            this.renderDisplayBoundaries(this.props.displays, JSON.parse(layout.display_positions));
+            this.renderDisplayBoundaries(this.props.displays, new Map(JSON.parse(this.props.layout.display_positions)));
         }
     }
 
-    renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<Number>>) {
+    renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<number>>) {
 
         let offsetLeft = 0;
         for (let display of displays) {
@@ -140,9 +174,9 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 left = offsetLeft,
                 top = 0;
 
-            if (displayPositions) {
-                left = displayPositions[display.key][0];
-                top = displayPositions[display.key][1];
+            if (displayPositions && displayPositions.size > 0) {
+                left = displayPositions.get(display.key)[0];
+                top = displayPositions.get(display.key)[1];
             }
 
             rect.set({
@@ -172,7 +206,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             this.attachTextEventHandlers(rect);
             this.canvas.add(rect);
 
-            this.displays[display.key] = [left, top];
+            this.displays.set(display.key, [left, top]);
 
             offsetLeft += display.resolution_x;
         }
@@ -194,13 +228,13 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         this.attachTextEventHandlers(text);
 
-        this.controls[message.control.key] = text;
+        this.controls.set(message.control.key, text);
         this.canvas.add(text);
     }
 
     controlUpdated(message: ControlUpdatedMessage) {
-        if (this.controls[message.control.key] !== undefined) {
-            this.controls[message.control.key].text = message.control.value;
+        if (this.controls.get(message.control.key) !== undefined) {
+            this.controls.get(message.control.key).text = message.control.value;
 
             this.renderCanvas();
         }
@@ -227,7 +261,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     attatchDisplayEventHandlers(object: any) {
         object.on('moved', () => {
-            this.displays[object.key] = [object.left, object.top];
+            this.displays.set(object.key, [object.left, object.top]);
         });
     }
 

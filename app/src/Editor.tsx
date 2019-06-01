@@ -1,15 +1,16 @@
 import * as React from 'react';
+import {Canvas} from './Canvas';
+import {Controls} from './Controls';
 import {Models} from './Models';
 import {SelectionControls} from './SelectionControls';
 import {GlobalStore} from './Store';
-import {getAPIEndpoint, getKeyFromURL} from './Utiltities';
-import {Controls} from "./Controls";
-import {Canvas} from "./Canvas";
+import {getAPIEndpoint} from './Utiltities';
+import {ViewOnlyCanvas} from './ViewOnlyCanvas';
 
 interface OverlayProps {
     store: GlobalStore;
-    viewOnly: boolean;
-    layout: Models.Layout
+    viewDisplayKey?: string;
+    layout?: Models.Layout
 }
 
 interface OverlayState {
@@ -46,19 +47,26 @@ export class Editor extends React.Component<OverlayProps, OverlayState> {
 
     render() {
         if (this.state.displays.length === 0) {
-            return <p>Must register at least one display to use the editor. <a href="/editor/">Go back?</a></p>
+            return <p>Must register at least one display to use the editor. <a href="/editor/">Go back?</a></p>;
         }
 
         return <div style={{display: 'flex'}}>
             {
-                this.props.viewOnly ?
-                    <div/> :
+                this.props.viewDisplayKey ?
                     <div>
-                        <Controls store={this.props.store}/>
-                        <SelectionControls store={this.props.store}/>
+                        <ViewOnlyCanvas store={this.props.store}
+                                        display={this.state.displays.find((display: Models.Display) => display.key === this.props.viewDisplayKey)}/>
+                    </div> :
+                    <div>
+                        <div>
+                            <Controls store={this.props.store}/>
+                            <SelectionControls store={this.props.store}/>
+                        </div>
+                        <Canvas store={this.props.store} displays={this.state.displays} layout={this.props.layout}/>
                     </div>
+
             }
-            <Canvas store={this.props.store} displays={this.state.displays} layout={this.props.layout}/>
+
         </div>;
     }
 }

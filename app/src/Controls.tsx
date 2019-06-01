@@ -69,7 +69,7 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
 
     renderControls = () => {
         return this.state.guages.map((gauge: Models.Gauge) =>
-            <tr>
+            <tr key={gauge.key}>
                 <td>{gauge.key}</td>
                 <td>{gauge.value}</td>
                 <td>
@@ -93,7 +93,7 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
                 </thead>
                 <tbody>
                 {this.renderControls()}
-                <tr>
+                <tr key={"insert-text"}>
                     <td>Insert text</td>
                     <td></td>
                     <td>

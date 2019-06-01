@@ -9,6 +9,7 @@ export namespace Models {
         available: boolean;
         resolution_x: number;
         resolution_y: number;
+        display_data: string;
     }
 
     export interface Layout {

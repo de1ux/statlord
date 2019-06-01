@@ -17,14 +17,20 @@ new ModelsProvider(store);
 if (getKeyFromURL() === null) {
     ReactDOM.render(<SetupWizard />,  document.getElementById('root'));
 } else {
-    let isViewOnly = window.location.href.indexOf('viewer') > -1;
+    let viewDisplayKey: string | undefined = undefined;
+    if (window.location.href.indexOf('viewer') > -1) {
+        viewDisplayKey = getKeyFromURL()
+    }
 
     getLayout().then((layout: Models.Layout) => {
         ReactDOM.render(
-            <Editor store={store} layout={layout} viewOnly={isViewOnly}/>,
+            <Editor store={store} layout={layout} viewDisplayKey={viewDisplayKey}/>,
             document.getElementById('root')
         );
-    });
-
-
+    }).catch((e) => {
+        ReactDOM.render(
+            <Editor store={store} layout={undefined} viewDisplayKey={viewDisplayKey}/>,
+            document.getElementById('root')
+        );
+    })
 }

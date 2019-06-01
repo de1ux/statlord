@@ -37,6 +37,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                 resolution_x: 400,
                 resolution_y: 600,
                 available: true,
+                display_data: '',
             },
         };
     }
