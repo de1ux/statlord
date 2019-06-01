@@ -104,8 +104,13 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
 
             let pixels = [];
+            let i = -1;
             for (let pixel of displayCanvasData.data) {
-                if (pixel < 127) {
+                i++;
+                if (i % 4 !== 0) {
+                    continue
+                }
+                if (pixel < 10) {
                     pixels.push(0)
                 } else {
                     pixels.push(1);

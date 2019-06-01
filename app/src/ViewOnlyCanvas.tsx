@@ -38,11 +38,16 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                 for (let i in parsed) {
                     let code = parsed[i] as number;
                     if (code === 0) {
-                        pixels.push(0);
+                        pixels.push(0); // R
+                        pixels.push(0); // G
+                        pixels.push(0); // B
                     }
                     if (code === 1) {
-                        pixels.push(255);
+                        pixels.push(255); // R
+                        pixels.push(255); // G
+                        pixels.push(255); // B
                     }
+                    pixels.push(255); // A
                 }
 
                 let pixelArray = new Uint8ClampedArray(pixels);
