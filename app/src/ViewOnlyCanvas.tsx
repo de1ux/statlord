@@ -26,7 +26,7 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
 
     async readFutureDisplayData() {
         if (this.canvas === undefined) {
-            setTimeout(() => this.readFutureDisplayData(), 1000);
+            setTimeout(() => this.readFutureDisplayData(), 500);
             return;
         }
 
@@ -36,7 +36,13 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                 let parsed = JSON.parse(display.display_data);
                 let pixels: Array<number> = [];
                 for (let i in parsed) {
-                    pixels.push(parsed[i] as number);
+                    let code = parsed[i] as number;
+                    if (code === 0) {
+                        pixels.push(0);
+                    }
+                    if (code === 1) {
+                        pixels.push(255);
+                    }
                 }
 
                 let pixelArray = new Uint8ClampedArray(pixels);
@@ -44,9 +50,9 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                 this.canvas.contextContainer.putImageData(
                     imgData,
                     0, 0, 0, 0, display.resolution_x, display.resolution_y);
-                console.log("Rendered to canvas from display");
+                console.log('Rendered to canvas from display');
 
-                setTimeout(() => this.readFutureDisplayData(), 1000);
+                setTimeout(() => this.readFutureDisplayData(), 500);
             });
     }
 

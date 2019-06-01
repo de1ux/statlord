@@ -88,7 +88,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     async writeFutureCanvasData() {
         if (this.canvas === undefined) {
-            setTimeout(() => this.writeFutureCanvasData(), 1000);
+            setTimeout(() => this.writeFutureCanvasData(), 500);
             return;
         }
 
@@ -102,7 +102,16 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
             console.log(`Snapping ${x}x${y} w=${w} h=${h}`);
             let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
-            display.display_data = JSON.stringify(displayCanvasData.data);
+
+            let pixels = [];
+            for (let pixel of displayCanvasData.data) {
+                if (pixel < 127) {
+                    pixels.push(0)
+                } else {
+                    pixels.push(1);
+                }
+            }
+            display.display_data = JSON.stringify(pixels);
 
             puts.push(fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
                 method: 'PUT',
@@ -114,12 +123,12 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
 
         await Promise.all(puts);
-        setTimeout(() => this.writeFutureCanvasData(), 1000);
+        setTimeout(() => this.writeFutureCanvasData(), 500);
     }
 
     writeFutureLayout() {
         if (this.canvas === undefined) {
-            setTimeout(() => this.writeFutureLayout(), 1000);
+            setTimeout(() => this.writeFutureLayout(), 500);
             return;
         }
 
@@ -135,7 +144,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 'Content-Type': 'application/json'
             },
         }).then(data => {
-            setTimeout(() => this.writeFutureLayout(), 1000);
+            setTimeout(() => this.writeFutureLayout(), 500);
         });
     }
 
@@ -167,6 +176,10 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<number>>) {
+        if (this.canvas === undefined) {
+            return;
+        }
+
         let offsetLeft = 0;
         for (let display of displays) {
             let rect = new fabric.Rect(),
@@ -206,6 +219,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             this.attatchDisplayEventHandlers(rect);
             this.attachTextEventHandlers(rect);
             this.canvas.add(rect);
+            rect.moveTo(-100);
 
             this.displays.set(display.key, [left, top]);
 
@@ -231,6 +245,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         this.controls.set(message.control.key, text);
         this.canvas.add(text);
+        text.moveTo(100);
     }
 
     controlUpdated(message: ControlUpdatedMessage) {
@@ -283,6 +298,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 this.attachTextEventHandlers(text);
 
                 this.canvas.add(text);
+                text.moveTo(100);
                 return;
             default:
                 alert(`Unrecognized element: ${message.element}`);
