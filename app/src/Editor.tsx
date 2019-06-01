@@ -50,14 +50,14 @@ export class Editor extends React.Component<OverlayProps, OverlayState> {
             return <p>Must register at least one display to use the editor. <a href="/editor/">Go back?</a></p>;
         }
 
-        return <div style={{display: 'flex'}}>
+        return <div>
             {
                 this.props.viewDisplayKey ?
                     <div>
                         <ViewOnlyCanvas store={this.props.store}
                                         display={this.state.displays.find((display: Models.Display) => display.key === this.props.viewDisplayKey)}/>
                     </div> :
-                    <div>
+                    <div style={{display: 'flex'}}>
                         <div>
                             <Controls store={this.props.store}/>
                             <SelectionControls store={this.props.store}/>

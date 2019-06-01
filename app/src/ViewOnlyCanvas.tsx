@@ -39,9 +39,12 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                     pixels.push(parsed[i] as number);
                 }
 
-                let imgData = new Uint8ClampedArray(pixels);
-                this.canvas.contextContainer.putImageData(new ImageData(imgData, display.resolution_x, display.resolution_y), 0, 0);
-                console.log("Rendered to canvas from display")
+                let pixelArray = new Uint8ClampedArray(pixels);
+                let imgData = new ImageData(pixelArray, display.resolution_x, display.resolution_y);
+                this.canvas.contextContainer.putImageData(
+                    imgData,
+                    0, 0, 0, 0, display.resolution_x, display.resolution_y);
+                console.log("Rendered to canvas from display");
 
                 setTimeout(() => this.readFutureDisplayData(), 3000);
             });

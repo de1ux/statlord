@@ -28,6 +28,7 @@ interface CanvasState {
 
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
     canvas: any;
+    tempCanvas: any;
     controls: Map<String, any> = new Map();
     displays: Map<String, Array<Number>> = new Map();
     lastRerender: RequestCanvasRenderMessage;
@@ -42,11 +43,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
 
-        if (isWorker()) {
-            this.writeFutureCanvasData();
-        } else {
-            this.writeFutureLayout();
-        }
+        this.writeFutureCanvasData();
+        this.writeFutureLayout();
     }
 
     onStoreTrigger = () => {
@@ -91,19 +89,23 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     async writeFutureCanvasData() {
         if (this.canvas === undefined) {
-            setTimeout(() => this.writeFutureCanvasData(), 5000);
+            setTimeout(() => this.writeFutureCanvasData(), 1000);
             return;
         }
 
         this.displays.forEach(async (position: Array<number>, key: string) => {
             let display = this.props.displays.find((display: Models.Display) => display.key === key),
-                x = position[0],
-                y = position[1],
+                x = Math.floor(position[0]),
+                y = Math.floor(position[1]),
                 w = display.resolution_x,
                 h = display.resolution_y;
 
+            console.log(`Snapping ${x}x${y} w=${w} h=${h}`);
             let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
             display.display_data = JSON.stringify(displayCanvasData.data);
+
+            this.tempCanvas.contextContainer.putImageData(
+                    displayCanvasData, 0, 0);
 
             await fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
                 method: 'PUT',
@@ -296,7 +298,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     };
 
     componentDidMount(): void {
-        this.canvas = new fabric.Canvas('overlay');
+        this.canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
+        this.tempCanvas = new fabric.Canvas('temp', {enableRetinaScaling: false});
 
         // add a method to add the "key" property to object output
         this.canvas.toJSONWithKeys = () => {
@@ -314,11 +317,19 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     render() {
-        return <canvas id="overlay"
+        return <div>
+            <canvas id="overlay"
                        width={`${this.largestDimension}px`}
                        height={`${this.largestDimension}px`}
                        style={{border: '1px solid #aaa'}}>
-        </canvas>;
+        </canvas>
+
+            <canvas id="temp"
+                       width={`400px`}
+                       height={`600px`}
+                       style={{border: '1px solid #aaa'}}>
+        </canvas>
+        </div>;
     }
 }
 
