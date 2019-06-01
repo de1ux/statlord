@@ -28,9 +28,8 @@ interface CanvasState {
 
 export class Canvas extends React.Component<CanvasProps, CanvasState> {
     canvas: any;
-    tempCanvas: any;
     controls: Map<String, any> = new Map();
-    displays: Map<String, Array<Number>> = new Map();
+    displays: Map<String, Array<number>> = new Map();
     lastRerender: RequestCanvasRenderMessage;
     lastDeleteObject: RequestCanvasDeleteObjectMessage;
     lastControlUpdated: ControlUpdatedMessage;
@@ -93,7 +92,8 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             return;
         }
 
-        this.displays.forEach(async (position: Array<number>, key: string) => {
+        let puts = [];
+        for (let [key, position] of this.displays.entries()) {
             let display = this.props.displays.find((display: Models.Display) => display.key === key),
                 x = Math.floor(position[0]),
                 y = Math.floor(position[1]),
@@ -104,19 +104,17 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
             display.display_data = JSON.stringify(displayCanvasData.data);
 
-            this.tempCanvas.contextContainer.putImageData(
-                    displayCanvasData, 0, 0);
-
-            await fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
+            puts.push(fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
                 method: 'PUT',
                 body: JSON.stringify(display),
                 headers: {
                     'Content-Type': 'application/json'
                 },
-            })
-        });
+            }));
+        }
 
-        setTimeout(() => this.writeFutureCanvasData(), 5000);
+        await Promise.all(puts);
+        setTimeout(() => this.writeFutureCanvasData(), 1000);
     }
 
     writeFutureLayout() {
@@ -137,7 +135,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 'Content-Type': 'application/json'
             },
         }).then(data => {
-            setTimeout(() => this.writeFutureLayout(), 5000);
+            setTimeout(() => this.writeFutureLayout(), 1000);
         });
     }
 
@@ -169,7 +167,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<number>>) {
-
         let offsetLeft = 0;
         for (let display of displays) {
             let rect = new fabric.Rect(),
@@ -177,8 +174,10 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 top = 0;
 
             if (displayPositions && displayPositions.size > 0) {
-                left = displayPositions.get(display.key)[0];
-                top = displayPositions.get(display.key)[1];
+                if (displayPositions.get(display.key)) {
+                    left = displayPositions.get(display.key)[0];
+                    top = displayPositions.get(display.key)[1];
+                }
             }
 
             rect.set({
@@ -299,7 +298,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     componentDidMount(): void {
         this.canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
-        this.tempCanvas = new fabric.Canvas('temp', {enableRetinaScaling: false});
 
         // add a method to add the "key" property to object output
         this.canvas.toJSONWithKeys = () => {
@@ -317,19 +315,11 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     render() {
-        return <div>
-            <canvas id="overlay"
+        return <canvas id="overlay"
                        width={`${this.largestDimension}px`}
                        height={`${this.largestDimension}px`}
                        style={{border: '1px solid #aaa'}}>
-        </canvas>
-
-            <canvas id="temp"
-                       width={`400px`}
-                       height={`600px`}
-                       style={{border: '1px solid #aaa'}}>
-        </canvas>
-        </div>;
+        </canvas>;
     }
 }
 

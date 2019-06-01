@@ -46,12 +46,12 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                     0, 0, 0, 0, display.resolution_x, display.resolution_y);
                 console.log("Rendered to canvas from display");
 
-                setTimeout(() => this.readFutureDisplayData(), 3000);
+                setTimeout(() => this.readFutureDisplayData(), 1000);
             });
     }
 
     componentDidMount(): void {
-        this.canvas = new fabric.Canvas('overlay');
+        this.canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
 
     }
 
