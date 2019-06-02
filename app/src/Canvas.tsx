@@ -1,5 +1,7 @@
 import * as React from 'react';
+import {Unsubscribe} from 'redux';
 import {Models} from './Models';
+import {serializeImageDataToBW} from './Serialization';
 import {
     ControlAddedMessage,
     ControlUpdatedMessage,
@@ -10,8 +12,7 @@ import {
     State,
     UPDATE_SELECTED_OBJECT
 } from './Store';
-import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, isEmpty, isWorker} from './Utiltities';
-import {Unsubscribe} from 'redux';
+import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, getLargestDisplayDimension} from './Utiltities';
 import set = Reflect.set;
 
 declare var fabric: any;
@@ -74,25 +75,13 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
     };
 
-    get largestDimension(): number {
-        let height = 0,
-            width = 0;
-
-        for (let display of this.props.displays) {
-            width += display.resolution_x;
-            height += display.resolution_y;
-        }
-
-        return width > height ? width : height;
-    }
-
     async writeFutureCanvasData() {
         if (this.canvas === undefined) {
             setTimeout(() => this.writeFutureCanvasData(), 500);
             return;
         }
 
-        let puts = [];
+        let fetches = [];
         for (let [key, position] of this.displays.entries()) {
             let display = this.props.displays.find((display: Models.Display) => display.key === key),
                 x = Math.floor(position[0]),
@@ -100,34 +89,21 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 w = display.resolution_x,
                 h = display.resolution_y;
 
-            console.log(`Snapping ${x}x${y} w=${w} h=${h}`);
-            let displayCanvasData = this.canvas.contextContainer.getImageData(x, y, w, h);
+            let displayData = this.canvas.contextContainer.getImageData(x, y, w, h);
+            display.display_data = serializeImageDataToBW(displayData);
 
-            let pixels = [];
-            let i = -1;
-            for (let pixel of displayCanvasData.data) {
-                i++;
-                if (i % 4 !== 0) {
-                    continue
-                }
-                if (pixel < 10) {
-                    pixels.push(0)
-                } else {
-                    pixels.push(1);
-                }
-            }
-            display.display_data = JSON.stringify(pixels);
-
-            puts.push(fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
-                method: 'PUT',
-                body: JSON.stringify(display),
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-            }));
+            fetches.push(
+                fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
+                    method: 'PUT',
+                    body: JSON.stringify(display),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                })
+            );
         }
 
-        await Promise.all(puts);
+        await Promise.all(fetches);
         setTimeout(() => this.writeFutureCanvasData(), 500);
     }
 
@@ -232,32 +208,15 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
     }
 
-    addControl(message: ControlAddedMessage) {
-        if (this.canvas === undefined) {
+    controlUpdated(message: ControlUpdatedMessage) {
+        if (this.controls.get(message.control.key) === undefined) {
             return;
         }
 
-        let textProperties = {
-            ...defaultTextProperties(),
-            left: 10,
-            top: 10,
-            key: message.control.key,
-        };
+        this.controls.get(message.control.key).text = message.control.value;
 
-        let text = new fabric.Text(message.control.value, textProperties);
-
-        this.attachTextEventHandlers(text);
-
-        this.controls.set(message.control.key, text);
-        this.canvas.add(text);
-        text.moveTo(100);
-    }
-
-    controlUpdated(message: ControlUpdatedMessage) {
-        if (this.controls.get(message.control.key) !== undefined) {
-            this.controls.get(message.control.key).text = message.control.value;
-
-            this.renderCanvas();
+        if (this.canvas) {
+            this.canvas.renderAll();
         }
     }
 
@@ -286,6 +245,26 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         });
     }
 
+    addControl(message: ControlAddedMessage) {
+        if (this.canvas === undefined) {
+            return;
+        }
+
+        let textProperties = {
+            ...defaultTextProperties(),
+            left: 10,
+            top: 10,
+            key: message.control.key,
+        };
+
+        let text = new fabric.Text(message.control.value, textProperties);
+        this.attachTextEventHandlers(text);
+        this.canvas.add(text);
+
+        this.controls.set(message.control.key, text);
+        text.moveTo(100);
+    }
+
     addElement(message: ElementAddedMessage) {
         if (this.canvas === undefined) {
             return;
@@ -310,13 +289,6 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
     }
 
-    renderCanvas = () => {
-        if (!this.canvas) {
-            return;
-        }
-        this.canvas.renderAll();
-    };
-
     componentDidMount(): void {
         this.canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
 
@@ -331,14 +303,15 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
             return origJSON;
         };
 
-
         this.renderCanvasFromLayoutData(this.props.layout);
     }
 
     render() {
+        let largestDimension = getLargestDisplayDimension(this.props.displays);
+
         return <canvas id="overlay"
-                       width={`${this.largestDimension}px`}
-                       height={`${this.largestDimension}px`}
+                       width={`${largestDimension}px`}
+                       height={`${largestDimension}px`}
                        style={{border: '1px solid #aaa'}}>
         </canvas>;
     }
