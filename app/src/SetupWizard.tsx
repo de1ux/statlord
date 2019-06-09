@@ -140,6 +140,11 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                         })}
                     </ul>
                     <div>
+                        <p>Common displays:</p>
+                        <ul>
+                            <li>Adafruit Sharp Memory LCD: 168x144</li>
+                            <li>Pimoroni Inky Phat: 104x212</li>
+                        </ul>
                         <p>Create a display:</p>
                         <label>Name</label>
                         <input type={'text'} value={this.state.newDisplay.key} onChange={(e) => this.setState({
