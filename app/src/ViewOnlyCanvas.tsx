@@ -33,16 +33,14 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
         fetch(getAPIEndpoint() + '/displays/' + this.props.display.key + '/')
             .then(data => data.json())
             .then((display: Models.Display) => {
-                let parsed = JSON.parse(display.display_data);
                 let pixels: Array<number> = [];
-                for (let i in parsed) {
-                    let code = parsed[i] as number;
-                    if (code === 0) {
+                for (let i = 0; i < display.display_data.length; i++) {
+                    let code = display.display_data[i];
+                    if (code === "0") {
                         pixels.push(0); // R
                         pixels.push(0); // G
                         pixels.push(0); // B
-                    }
-                    if (code === 1) {
+                    } else {
                         pixels.push(255); // R
                         pixels.push(255); // G
                         pixels.push(255); // B

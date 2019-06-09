@@ -144,6 +144,7 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
                         <ul>
                             <li>Adafruit Sharp Memory LCD: 168x144</li>
                             <li>Pimoroni Inky Phat: 104x212</li>
+                            <li>Pimoroni Hyperpixel: 800x480</li>
                         </ul>
                         <p>Create a display:</p>
                         <label>Name</label>
