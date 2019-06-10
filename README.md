@@ -2,6 +2,8 @@
 
 > Display realtime data on spare OLEDs, e-paper, LCDs, and browsers
 
+![demo](demo.gif)
+
 ## Getting started
 
 Install dependencies
