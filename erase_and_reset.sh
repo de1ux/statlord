@@ -1,3 +1,4 @@
 psql -h localhost statlord -c "DROP SCHEMA public CASCADE;CREATE SCHEMA public;"
+python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver 0.0.0.0:8000

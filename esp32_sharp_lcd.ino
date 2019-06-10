@@ -21,7 +21,7 @@ Adafruit_SharpMem display(SHARP_SCK, SHARP_MOSI, SHARP_SS, 144, 168);
 const char* ssid     = "ssid";
 const char* password = "password";
 
-const char* host = path/to/statlord;
+const char* host = "192.168.1.41";
 const char* streamId   = "....................";
 const char* privateKey = "....................";
 
@@ -95,8 +95,6 @@ void loop()
         line = client.readStringUntil('\r');
     }
 
-    // WARNING - this is an arbitrary number. Memory consumption could be reduced
-    // by measuring the exact payload expected for this device's resolution
     DynamicJsonDocument doc(40720);
     auto error = deserializeJson(doc, line);
     if (error) {
@@ -110,8 +108,8 @@ void loop()
 
     display.clearDisplay();
     int i = -1;
-    for (int y = 0; y < 144; y++) {
-      for (int x = 0; x < 168; x++) {
+    for (int y = 0; y < 168; y++) {
+      for (int x = 0; x < 144; x++) {
         i++;
         if (display_data[i] == '0') {
           continue;

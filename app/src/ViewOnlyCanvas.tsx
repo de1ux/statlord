@@ -37,13 +37,13 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
                 for (let i = 0; i < display.display_data.length; i++) {
                     let code = display.display_data[i];
                     if (code === "0") {
-                        pixels.push(0); // R
-                        pixels.push(0); // G
-                        pixels.push(0); // B
-                    } else {
                         pixels.push(255); // R
                         pixels.push(255); // G
                         pixels.push(255); // B
+                    } else {
+                        pixels.push(0); // R
+                        pixels.push(0); // G
+                        pixels.push(0); // B
                     }
                     pixels.push(255); // A
                 }

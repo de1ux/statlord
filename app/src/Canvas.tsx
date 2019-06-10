@@ -90,7 +90,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 h = display.resolution_y;
 
             let displayData = this.canvas.contextContainer.getImageData(x, y, w, h);
-            display.display_data = serializeImageDataToBW(displayData);
+            display.display_data = serializeImageDataToBW(displayData, display);
 
             fetches.push(
                 fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {

@@ -20,3 +20,6 @@ class Display(models.Model):
     current_layout = models.ForeignKey(Layout, on_delete=models.SET_NULL, null=True)
     display_data = models.TextField(default='')
 
+    rotation = models.IntegerField(default=0)
+
+

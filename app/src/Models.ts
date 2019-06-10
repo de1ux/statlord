@@ -10,6 +10,7 @@ export namespace Models {
         resolution_x: number;
         resolution_y: number;
         display_data: string;
+        rotation: number;
     }
 
     export interface Layout {

@@ -60,6 +60,7 @@ class DisplayItem(APIView):
             'resolution_x': request.data['resolution_x'],
             'resolution_y': request.data['resolution_y'],
             'display_data': request.data['display_data'],
+            'rotation': 0,
             'available': True}))
 
         serializer = DisplaySerializer(display, data=request.data)
