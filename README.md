@@ -1,5 +1,7 @@
 # statlord
 
+https://travis-ci.org/de1ux/statlord.svg?branch=master&status=unknown
+
 > Display realtime data on spare OLEDs, e-paper, LCDs, and browsers
 
 ![demo](docs/demo.gif)
