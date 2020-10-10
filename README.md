@@ -2,7 +2,7 @@
 
 > Display realtime data on spare OLEDs, e-paper, LCDs, and browsers
 
-![demo](demo.gif)
+![demo](docs/demo.gif)
 
 ## Getting started
 
@@ -16,13 +16,13 @@ $ cd app && npm i
 
 Run backend
 ```
-$ ./manage.py runserver 8000
+$ ./manage.py runserver 0.0.0.0:8000
 ```
 
 Run frontend
 ```bash
 $ cd app && npm run dev
-``` 
+```
 
 Visit the [wizard](http://0.0.0.0:8000/editor/)
 
@@ -45,14 +45,14 @@ $ curl -XPUT \
     -d '{"resolution_x": 212, "resolution_y": 104}' \
     -H "Content-Type: application/json" \
     http://0.0.0.0:8000/api/displays/inkyphat-and-raspberry-pi-zero/
-    
+
 {"available":true,"resolution_x":212,"resolution_y":104,"current_layout":null}
-    
+
 $ curl -XPUT \
     -d '{"resolution_x": 800, "resolution_y": 480}' \
     -H "Content-Type: application/json" \
     http://0.0.0.0:8000/api/displays/hyperpixel-and-raspberry-pi/
-    
+
 {"available":true,"resolution_x":800,"resolution_y":480,"current_layout":null}
 ```
 
