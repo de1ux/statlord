@@ -1,4 +1,4 @@
-tag := $(git rev-parse --short HEAD)
+tag ?= $(git rev-parse --short HEAD)
 
 install: install-server install-client
 
