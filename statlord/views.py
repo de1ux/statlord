@@ -6,8 +6,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from core.models import Display, Gauge, Layout
-from core.serializers import DisplaySerializer, GaugeSerializer, LayoutSerializer
+from statlord.models import Display, Gauge, Layout
+from statlord.serializers import DisplaySerializer, GaugeSerializer, LayoutSerializer
 
 
 class GaugeList(APIView):
@@ -31,7 +31,6 @@ class GaugeItem(APIView):
 
     def put(self, request, key, format=None):
         gauge, created = Gauge.objects.update_or_create(key=key, defaults=({'value': request.data['value']}))
-        print(f"Created: {created}")
         serializer = GaugeSerializer(gauge)
         return Response(serializer.data)
 

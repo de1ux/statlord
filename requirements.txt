@@ -1,4 +1,5 @@
 Django==2.2.1
 djangorestframework==3.9.4
 requests==2.21.0
-psycopg2-2.8.2
+psycopg2-binary
+python-env-utils==0.4.1

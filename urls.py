@@ -16,7 +16,7 @@ Including another URLconf
 from django.urls import path, re_path
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from core import views
+from statlord import views
 
 urlpatterns = [
     path('api/gauges/', views.GaugeList.as_view()),

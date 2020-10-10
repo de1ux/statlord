@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('available', models.BooleanField(default=False)),
                 ('resolution_x', models.IntegerField(default=0)),
                 ('resolution_y', models.IntegerField(default=0)),
-                ('current_layout', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='core.Layout')),
+                ('current_layout', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to='statlord.Layout')),
             ],
         ),
     ]
