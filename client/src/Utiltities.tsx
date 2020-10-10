@@ -56,5 +56,5 @@ export function getLargestDisplayDimension(displays: Array<Models.Display>): num
             height += display.resolution_y;
         }
 
-        return width > height ? width : height;
+        return (width > height ? width : height) + 100;
     }

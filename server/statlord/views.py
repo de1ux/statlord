@@ -1,7 +1,7 @@
 import json
 from urllib.request import Request, urlopen
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,7 +12,7 @@ from statlord.serializers import DisplaySerializer, GaugeSerializer, LayoutSeria
 
 
 class GaugeList(APIView):
-    def get(self, request, format=None):
+    def get(self, request):
         guages = Gauge.objects.all()
         serializer = GaugeSerializer(guages, many=True)
         return Response(serializer.data)
@@ -25,19 +25,19 @@ class GaugeItem(APIView):
         except Gauge.DoesNotExist:
             raise Http404
 
-    def get(self, request, key, format=None):
+    def get(self, request, key):
         gauge = self.get_object(key)
         serializer = GaugeSerializer(gauge)
         return Response(serializer.data)
 
-    def put(self, request, key, format=None):
+    def put(self, request, key):
         gauge, created = Gauge.objects.update_or_create(key=key, defaults=({'value': request.data['value']}))
         serializer = GaugeSerializer(gauge)
         return Response(serializer.data)
 
 
 class DisplayList(APIView):
-    def get(self, request, format=None):
+    def get(self, request):
         displays = Display.objects.all()
         serializer = DisplaySerializer(displays, many=True)
         return Response(serializer.data)
@@ -50,29 +50,30 @@ class DisplayItem(APIView):
         except Display.DoesNotExist:
             raise Http404
 
-    def get(self, request, key, format=None):
+    def get(self, request, key):
         gauge = self.get_object(key)
         serializer = DisplaySerializer(gauge)
         return Response(serializer.data)
 
-    def put(self, request, key, format=None):
-        display, created = Display.objects.update_or_create(key=key, defaults=({
-            'resolution_x': request.data['resolution_x'],
-            'resolution_y': request.data['resolution_y'],
-            'display_data': request.data['display_data'],
-            'rotation': 0,
-            'available': True}))
+    def put(self, request, key):
+        if 'resolution_x' in request.data and 'resolution_y' in request.data:
+            # TODO - not sure these fields are needed
+            display, _ = Display.objects.update_or_create(key=key, defaults=({
+                'resolution_x': request.data['resolution_x'],
+                'resolution_y': request.data['resolution_y'],
+                'display_data': request.data['display_data'],
+                'rotation': 0,
+                'available': True}))
+        else:
+            # coming from a headless update
+            display = Display.objects.get(key=key)
+            display.display_data = request.data['display_data']
 
-        serializer = DisplaySerializer(display, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({}, status=status.HTTP_200_OK)
 
 
 class LayoutList(APIView):
-    def get(self, request, format=None):
+    def get(self, request):
         layouts = Layout.objects.all()
         serializer = LayoutSerializer(layouts, many=True)
         return Response(serializer.data)
@@ -85,14 +86,16 @@ class LayoutItem(APIView):
         except Layout.DoesNotExist:
             raise Http404
 
-    def get(self, request, key, format=None):
+    def get(self, request, key):
         layout = self.get_object(key)
         return Response({
             'key': key,
             'data': bytes(layout.data).decode(),
             'display_positions': layout.display_positions})
 
-    def put(self, request, key, format=None):
+    def put(self, request, key):
+        import pdb;
+        pdb.set_trace()
         layout, created = Layout.objects.update_or_create(key=key, defaults=({
             'data': json.dumps(request.data['data']).encode(),
             'display_positions': request.data['display_positions']}))
@@ -102,8 +105,13 @@ class LayoutItem(APIView):
 
 
 class StaticAssets(APIView):
-    def get(self, request, path=None, format=None):
-        """"""
+    def get(self, request, path=None):
+        if settings.DEBUG:
+            url = f"http://0.0.0.0:3000/{path}"
+            req = Request(url)
+            res = urlopen(req)
+            return HttpResponse(res.read())
+
         if not path:
             path = "index.html"
 

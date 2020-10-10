@@ -104,7 +104,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
 
         await Promise.all(fetches);
-        setTimeout(() => this.writeFutureCanvasData(), 500);
+        setTimeout(() => this.writeFutureCanvasData(), 1000);
     }
 
     writeFutureLayout() {
@@ -125,7 +125,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
                 'Content-Type': 'application/json'
             },
         }).then(data => {
-            setTimeout(() => this.writeFutureLayout(), 500);
+            setTimeout(() => this.writeFutureLayout(), 1000);
         });
     }
 
