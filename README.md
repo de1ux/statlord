@@ -6,27 +6,28 @@
 
 ![demo](docs/demo.gif)
 
-## Getting started
+## Quickstart
+
+TODO - docker image is building, but not 100% standalone/ready
+
+## Developing
+
+Requirements
+* postgres
+* python >3.5
+* nodejs, npm
 
 Install dependencies
 ```
-$ pip install -r requirements.txt
-$ ./erase_and_reset.sh
-
-$ cd app && npm i
+$ make install
 ```
 
-Run backend
+Run the stack
 ```
-$ ./manage.py runserver 0.0.0.0:8000
-```
-
-Run frontend
-```bash
-$ cd app && npm run dev
+$ make run
 ```
 
-Visit the [wizard](http://0.0.0.0:8000/editor/)
+Visit the [editor](http://0.0.0.0:8000/editor/)
 
 ## Usage (browser)
 
@@ -58,3 +59,20 @@ $ curl -XPUT \
 {"available":true,"resolution_x":800,"resolution_y":480,"current_layout":null}
 ```
 
+## Architecture
+
+![architecture](docs/architecture.png)
+
+### Editor
+
+Use to create layouts of different displays. Position text, gauges, and other interesting data across muliple displays.
+
+### Viewer
+
+A set of headless browsers that are rendering what each display "sees" in the layout. That includes rendering the latest values from a gauge.
+
+Rendered data is currently a matrix of bits -- 0 for white, and 1 for black. 
+
+## Displays
+
+All of the screens that will display data. It could be a bunch of Raspberry Pis with e-paper diplays, Arduinos with oleds, browser windows -- anything that can represent bw image data.
