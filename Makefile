@@ -21,14 +21,6 @@ run-client:
 run:
 	make -j 2 run-server run-client
 
-build-server:
-	cd server && \
-	docker build -t statlord:$(tag) .
-
-build-client:
-	cd client && \
-	docker build -t statlord:$(tag) .
-
 build:
-	make build-server
-	make build-client
+	docker build -t statlord:$(tag) .
+
