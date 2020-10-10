@@ -1,3 +1,4 @@
+GIT_SHA = ${TRAVIS_COMMIT}
 
 install: install-server install-client
 
@@ -19,3 +20,10 @@ run-client:
 
 run:
 	make -j 2 run-server run-client
+
+build-server:
+	cd server && \
+	docker build -t statlord:$(GIT_SHA) .
+
+build:
+	make build-server
