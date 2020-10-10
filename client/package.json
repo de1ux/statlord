@@ -65,7 +65,8 @@
   "main": "index.tsx",
   "name": "app",
   "scripts": {
-    "dev": "webpack-dev-server"
+    "dev": "webpack-dev-server",
+    "build": "webpack"
   },
   "version": "0.0.1",
   "dependencies": {

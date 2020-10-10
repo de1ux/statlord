@@ -14,7 +14,6 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path, re_path
-from rest_framework.urlpatterns import format_suffix_patterns
 
 from statlord import views
 
@@ -32,5 +31,3 @@ urlpatterns = [
     path('editor/', views.StaticAssets.as_view()),
 
 ]
-
-urlpatterns = format_suffix_patterns(urlpatterns)

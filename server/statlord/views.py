@@ -5,6 +5,7 @@ from django.http import Http404, HttpResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.conf import settings
 
 from statlord.models import Display, Gauge, Layout
 from statlord.serializers import DisplaySerializer, GaugeSerializer, LayoutSerializer
@@ -102,7 +103,9 @@ class LayoutItem(APIView):
 
 class StaticAssets(APIView):
     def get(self, request, path=None, format=None):
-        url = f"http://0.0.0.0:3000/{path}"
-        req = Request(url)
-        res = urlopen(req)
-        return HttpResponse(res.read())
+        """"""
+        if not path:
+            path = "index.html"
+
+        test_file = open(f'./static/{path}', 'r')
+        return HttpResponse(content=test_file)

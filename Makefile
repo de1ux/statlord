@@ -1,4 +1,4 @@
-GIT_SHA = ${TRAVIS_COMMIT}
+tag = $(git rev-parse --short ${TRAVIS_COMMIT})
 
 install: install-server install-client
 
@@ -23,7 +23,12 @@ run:
 
 build-server:
 	cd server && \
-	docker build -t statlord:$(GIT_SHA) .
+	docker build -t statlord:$(tag) .
+
+build-client:
+	cd client && \
+	docker build -t statlord:$(tag) .
 
 build:
 	make build-server
+	make build-client
