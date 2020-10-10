@@ -1,4 +1,4 @@
-tag ?= $(git rev-parse --short HEAD)
+tag := $(TRAVIS_BUILD_NUMBER)
 
 install: install-server install-client
 
