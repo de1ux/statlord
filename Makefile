@@ -1,4 +1,4 @@
-tag = $(git rev-parse --short ${TRAVIS_COMMIT})
+tag = $(git rev-parse --short HEAD)
 
 install: install-server install-client
 
