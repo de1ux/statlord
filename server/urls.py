@@ -26,10 +26,10 @@ urlpatterns = [
     path('api/layouts/', views.LayoutList.as_view()),
     path('api/layouts/<str:key>/', views.LayoutItem.as_view()),
 
-    url(r'^viewer/(?P<path>.*)', views.StaticAssets.as_view()),
-    path('viewer/', views.StaticAssets.as_view()),
-    url(r'^editor/(?P<path>.*)', views.StaticAssets.as_view()),
-    path('editor/', views.StaticAssets.as_view()),
+    url(r'^view/(?P<path>.*)', views.StaticAssets.as_view()),
+    path('view/', views.StaticAssets.as_view()),
+    url(r'^edit/.*', views.StaticAssets.as_view()),
+    path('edit/', views.StaticAssets.as_view()),
     path('', views.StaticAssets.as_view()),
     url(r'^(?P<path>.*)', views.StaticAssets.as_view()),
 ]

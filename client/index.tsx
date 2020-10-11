@@ -2,12 +2,11 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import {ControlsProvider} from './src/ControlsProvider';
 import {CreateGlobalStore} from './src/Store';
-import {getKeyFromURL, getLayout} from "./src/Utiltities";
-import {SetupWizard} from "./src/SetupWizard";
 import {Editor} from "./src/Editor";
 import {ModelsProvider} from "./src/ModelsProvider";
 import {Home} from "./src/Home";
-import {Layout} from "./src/Models";
+import {Provider} from "react-redux";
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
 let store = CreateGlobalStore();
 
@@ -15,8 +14,25 @@ let store = CreateGlobalStore();
 new ControlsProvider(store);
 new ModelsProvider(store);
 
+ReactDOM.render(
+    <Provider store={store}>
+        <Router>
+            <Switch>
+                <Route path="/edit/:key" component={Editor}/>
+                <Route path="/" component={Home}/>
+            </Switch>
+        </Router>
+    </Provider>,
+    document.getElementById('root')
+);
+
+/*
 if (getKeyFromURL() === null) {
-    ReactDOM.render(<Home store={store}/>, document.getElementById('root'));
+    ReactDOM.render(
+        <Provider store={store}>
+            <Home store={store}/>
+        </Provider>,
+        document.getElementById('root'));
 } else {
     let viewDisplayKey: string | undefined = undefined;
     if (window.location.href.indexOf('viewer') > -1) {
@@ -25,13 +41,8 @@ if (getKeyFromURL() === null) {
 
     getLayout().then((layout: Layout) => {
         ReactDOM.render(
-            <Editor store={store} layout={layout} viewDisplayKey={viewDisplayKey}/>,
-            document.getElementById('root')
-        );
-    }).catch((e) => {
-        ReactDOM.render(
-            <Editor store={store} layout={undefined} viewDisplayKey={viewDisplayKey}/>,
-            document.getElementById('root')
-        );
+            <Provider store={store}>
+                <Editor store={store} layout={layout} viewDisplayKey={viewDisplayKey}/>
+            </Provider>,
     })
-}
+}*/

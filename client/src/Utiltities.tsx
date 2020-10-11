@@ -21,12 +21,6 @@ export function getKeyFromURL(): string | null {
     return url.searchParams.get('key');
 }
 
-export function isWorker(): boolean {
-    let url = new URL(window.location.href);
-    return url.searchParams.get('worker') === "true";
-}
-
-
 export async function getLayout(key?: string): Promise<Layout> {
     if (key === undefined || key === '') {
         key = getKeyFromURL();

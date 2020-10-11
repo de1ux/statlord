@@ -94,8 +94,6 @@ class LayoutItem(APIView):
             'display_positions': layout.display_positions})
 
     def put(self, request, key):
-        import pdb;
-        pdb.set_trace()
         layout, created = Layout.objects.update_or_create(key=key, defaults=({
             'data': json.dumps(request.data['data']).encode(),
             'display_positions': request.data['display_positions']}))
@@ -108,6 +106,8 @@ class StaticAssets(APIView):
     def get(self, request, path=None):
         if not path:
             path = "index.html"
+        if 'edit' in path:
+            path = 'index.html'
 
         if settings.DEBUG:
             url = f"http://0.0.0.0:3000/{path}"

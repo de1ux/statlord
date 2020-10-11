@@ -1,5 +1,6 @@
 import {createStore, Store} from 'redux';
 import {Display, Gauge, Layout} from "./Models";
+import {Res} from "awesome-typescript-loader/dist/checker/protocol";
 
 export const
     CONTROL_ADDED = 'CONTROL_ADDED',
@@ -49,10 +50,35 @@ export interface SetDisplaysMessage {
     displays: Array<Display>
 }
 
+export type ResourceInitialState = {
+    state: "init";
+};
+
+export type ResourceLoadingState = {
+    state: "loading";
+};
+
+export type ResourceFailedState = {
+    state: "failed";
+    reason: string;
+};
+
+export type ResourceSuccessState<T> = {
+    state: "success";
+    data: T;
+};
+
+export type ResourceState<T> =
+    | ResourceInitialState
+    | ResourceLoadingState
+    | ResourceFailedState
+    | ResourceSuccessState<T>;
+
+
 export interface State {
-    layouts: Array<Layout>
-    gauges: Array<Gauge>
-    displays: Array<Display>
+    layouts: ResourceState<Array<Layout>>;
+    gauges: ResourceState<Array<Gauge>>;
+    displays: ResourceState<Array<Display>>;
 
     elementAdded: ElementAddedMessage;
     controlAdded: ControlAddedMessage;
@@ -117,5 +143,15 @@ function reducer(state: State, action: Action) {
 export type GlobalStore = Store<State>;
 
 export function CreateGlobalStore(): GlobalStore {
-    return createStore(reducer);
+    return createStore(reducer, {
+        layouts: {
+            state: 'init'
+        },
+        displays: {
+            state: 'init'
+        },
+        gauges: {
+            state: 'init'
+        }
+    });
 }

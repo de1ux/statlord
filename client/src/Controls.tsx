@@ -1,54 +1,17 @@
 import * as React from 'react';
-import {CONTROL_ADDED, CONTROL_UPDATED, ELEMENT_ADDED, GlobalStore} from './Store';
-import {getAPIEndpoint} from './Utiltities';
+import {CONTROL_ADDED, ELEMENT_ADDED, ResourceState, State} from './Store';
 import {Gauge} from "./Models";
+import {useDispatch, useSelector} from "react-redux";
 
-interface ControlsProps {
-    store: GlobalStore
-}
+export const Controls = () => {
+    const dispatch = useDispatch();
+    const gauges = useSelector<State, ResourceState<Array<Gauge>>>(
+        state => state.gauges
+    );
 
-interface ControlsState {
-    guages: Array<Gauge>;
-}
-
-export class Controls extends React.Component<ControlsProps, ControlsState> {
-    state: ControlsState = {
-        guages: [],
-    };
-
-    componentDidMount(): void {
-        this.setFutureGaugesRefresh()
-    }
-
-    setFutureGaugesRefresh(): void {
-        fetch(getAPIEndpoint() + "/gauges/")
-            .then(data => data.json())
-            .then((data) => {
-                this.setState({
-                    guages: data.map((d: any) => {
-                        return {
-                            key: d.key,
-                            value: d.value
-                        };
-                    })
-                });
-
-                for (let gauge of data) {
-                    this.props.store.dispatch({
-                        type: CONTROL_UPDATED,
-                        controlUpdated: {
-                            control: gauge,
-                        },
-                    })
-                }
-
-                setTimeout(() => this.setFutureGaugesRefresh(), 3000);
-            })
-    }
-
-    addControl = (gauge: Gauge) => (e: React.MouseEvent) => {
+    const addControl = (gauge: Gauge) => (e: React.MouseEvent) => {
         e.preventDefault();
-        this.props.store.dispatch({
+        dispatch({
             type: CONTROL_ADDED,
             controlAdded: {
                 control: gauge,
@@ -56,9 +19,9 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
         });
     };
 
-    addItext = (e: React.MouseEvent) => {
+    const addItext = (e: React.MouseEvent) => {
         e.preventDefault();
-        this.props.store.dispatch({
+        dispatch({
             type: ELEMENT_ADDED,
             elementAdded: {
                 element: 'itext',
@@ -67,41 +30,37 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
         })
     };
 
-    renderControls = () => {
-        return this.state.guages.map((gauge: Gauge) =>
-            <tr key={gauge.key}>
-                <td>{gauge.key}</td>
-                <td>{gauge.value}</td>
+    return <div>
+        <table>
+            <thead>
+            <tr>
+                <th>Key</th>
+                <th>Value</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            {
+                gauges.state === 'success' ? gauges.data.map((gauge: Gauge) =>
+                    <tr key={gauge.key}>
+                        <td>{gauge.key}</td>
+                        <td>{gauge.value}</td>
+                        <td>
+                            <button onClick={addControl(gauge)}>
+                                Add
+                            </button>
+                        </td>
+                    </tr>
+                ) : null
+            }
+            <tr key={"insert-text"}>
+                <td>Insert text</td>
+                <td></td>
                 <td>
-                    <button onClick={this.addControl(gauge)}>
-                        Add
-                    </button>
+                    <button onClick={addItext}>Add</button>
                 </td>
             </tr>
-        );
-    };
-
-    render() {
-        return <div>
-            <table>
-                <thead>
-                <tr>
-                    <th>Key</th>
-                    <th>Value</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {this.renderControls()}
-                <tr key={"insert-text"}>
-                    <td>Insert text</td>
-                    <td></td>
-                    <td>
-                        <button onClick={this.addItext}>Add</button>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    }
-}
+            </tbody>
+        </table>
+    </div>;
+};

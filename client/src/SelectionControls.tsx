@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {defaultTextProperties, TextValues} from './Utiltities';
-import {GlobalStore, REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER, State} from "./Store";
+import {REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER} from "./Store";
 import {Unsubscribe} from "redux";
+import {useDispatch} from "react-redux";
 
 
 interface SelectionControlsProps {
-    store: GlobalStore;
 }
 
 interface SelectionControlsState extends TextValues {
@@ -18,20 +18,12 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
     constructor(props: SelectionControlsProps) {
         super(props);
 
-        this.unsubscribe = this.props.store.subscribe(() => this.onStoreTrigger());
         this.state = defaultTextProperties()
     }
 
-    onStoreTrigger = () => {
-        let state: State = this.props.store.getState();
-        if (state.updateSelectedObject && this.state.selected != state.updateSelectedObject) {
-            this.setState({
-                selected: state.updateSelectedObject.object,
-            });
-        }
-    };
-
     changeFontSize = (e: React.FormEvent<HTMLInputElement>) => {
+        const dispatch = useDispatch();
+
         this.setState<any>({
             fontSize: e.currentTarget.value,
         });
@@ -39,7 +31,7 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
         // TODO - this is bad
         this.state.selected.fontSize = e.currentTarget.value;
 
-        this.props.store.dispatch({
+        dispatch({
             type: REQUEST_CANVAS_RENDER,
             requestCanvasRender: {
                 when: (new Date).getTime()
@@ -48,6 +40,8 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
     };
 
     changeFontFamily = (e: React.FormEvent<HTMLSelectElement>) => {
+        const dispatch = useDispatch();
+
         this.setState<any>({
             fontFamily: e.currentTarget.value,
         });
@@ -55,7 +49,7 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
         // TODO - this is bad
         this.state.selected.fontFamily = e.currentTarget.value;
 
-        this.props.store.dispatch({
+        dispatch({
             type: REQUEST_CANVAS_RENDER,
             requestCanvasRender: {
                 when: (new Date).getTime()
@@ -68,6 +62,8 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
     }
 
     render() {
+        const dispatch = useDispatch();
+
         if (this.state.selected === undefined) {
             return <p>Nothing selected</p>
         }
@@ -85,10 +81,11 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
                 </select>
                 <br/>
 
-                <button onClick={(e) => this.props.store.dispatch({
+                <button onClick={(e) => dispatch({
                     type: REQUEST_CANVAS_DELETE_OBJECT,
                     requestCanvasDeleteObject: {
-                        when: (new Date).getTime()}
+                        when: (new Date).getTime()
+                    }
                 })}>Delete
                 </button>
             </p>

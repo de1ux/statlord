@@ -1,11 +1,12 @@
 import * as React from 'react';
-import {Canvas} from './Canvas';
-import {Controls} from './Controls';
-import {SelectionControls} from './SelectionControls';
-import {GlobalStore} from './Store';
-import {getAPIEndpoint} from './Utiltities';
-import {ViewOnlyCanvas} from './ViewOnlyCanvas';
-import {Display, Gauge, Layout} from "./Models";
+import {GlobalStore, ResourceState, State} from './Store';
+import {Display, Layout} from "./Models";
+import {useSelector} from "react-redux";
+import {useParams} from "react-router-dom";
+import api from "./api";
+import {Controls} from "./Controls";
+import {SelectionControls} from "./SelectionControls";
+import {Canvas} from "./Canvas";
 
 interface OverlayProps {
     store: GlobalStore;
@@ -13,60 +14,47 @@ interface OverlayProps {
     layout?: Layout
 }
 
-interface OverlayState {
-    selectedControl?: Gauge;
-    selectedObject?: any;
 
-    displays: Array<Display>;
-}
+export const Editor = (props: OverlayProps) => {
+    let {key} = useParams();
 
-export class Editor extends React.Component<OverlayProps, OverlayState> {
-    constructor(props: OverlayProps) {
-        super(props);
+    const layouts = useSelector<State, ResourceState<Array<Layout>>>(
+        state => state.layouts
+    );
+    const displays = useSelector<State, ResourceState<Array<Display>>>(
+        state => state.displays
+    );
 
-        this.state = {
-            displays: [],
-        };
+    switch (layouts.state) {
+        case "init":
+            api.fetchLayouts();
+            return <p>Loading...</p>;
+        case "loading":
+            return <p>Loading...</p>;
+        case "failed":
+            return <p>Failed: {layouts.reason}</p>;
     }
 
-    componentDidMount(): void {
-        this.setFutureDisplaysRefresh();
+    switch (displays.state) {
+        case "init":
+            api.fetchDisplays();
+            return <p>Loading...</p>;
+        case "loading":
+            return <p>Loading...</p>;
+        case "failed":
+            return <p>Failed: {displays.reason}</p>;
     }
 
-    setFutureDisplaysRefresh() {
-        fetch(getAPIEndpoint() + '/displays/')
-            .then(data => data.json())
-            .then((displays: Array<Display>) => {
-                this.setState({
-                    displays: displays,
-                });
-
-                setTimeout(() => this.setFutureDisplaysRefresh(), 3000);
-            });
+    const layout = layouts.data.find(layout => layout.key === key);
+    if (!layout) {
+        return <p>Failed to find a layout with key: {key}</p>
     }
 
-    render() {
-        if (this.state.displays.length === 0) {
-            return <p>Must register at least one display to use the editor. <a href="/editor/">Go back?</a></p>;
-        }
-
-        return <div>
-            {
-                this.props.viewDisplayKey ?
-                    <div>
-                        <ViewOnlyCanvas store={this.props.store}
-                                        display={this.state.displays.find((display: Display) => display.key === this.props.viewDisplayKey)}/>
-                    </div> :
-                    <div style={{display: 'flex'}}>
-                        <div>
-                            <Controls store={this.props.store}/>
-                            <SelectionControls store={this.props.store}/>
-                        </div>
-                        <Canvas store={this.props.store} displays={this.state.displays} layout={this.props.layout}/>
-                    </div>
-
-            }
-
-        </div>;
-    }
-}
+    // TODO - put <SelectionControls/> back in!!
+    return <div style={{display: 'flex'}}>
+        <div>
+            <Controls/>
+        </div>
+        <Canvas displays={displays.data} layout={layout}/>
+    </div>
+};
