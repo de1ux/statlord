@@ -4,6 +4,7 @@ import {ControlAddedMessage, ControlUpdatedMessage, ElementAddedMessage, UPDATE_
 import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, getLargestDisplayDimension} from './Utiltities';
 import {Display, Layout} from "./Models";
 import {useDispatch} from "react-redux";
+import {useEffect} from "react";
 
 declare var fabric: any;
 
@@ -16,6 +17,7 @@ export const Canvas = (props: CanvasProps) => {
     let canvas: any;
     let controls: Map<String, any> = new Map();
     let displays: Map<String, Array<number>> = new Map();
+    const dispatch = useDispatch();
 
     const writeFutureCanvasData = async () => {
         if (canvas === undefined) {
@@ -165,7 +167,6 @@ export const Canvas = (props: CanvasProps) => {
     };
 
     const attachTextEventHandlers = (object: any) => {
-        const dispatch = useDispatch();
         object.on('selected', () => {
             dispatch({
                 type: UPDATE_SELECTED_OBJECT,
@@ -234,20 +235,22 @@ export const Canvas = (props: CanvasProps) => {
         }
     };
 
-    canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
+    useEffect(() => {
+        canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
 
-    // add a method to add the "key" property to object output
-    canvas.toJSONWithKeys = () => {
-        let origJSON = canvas.toJSON();
-        origJSON.objects = canvas.getObjects().map((object: any) => {
-            let origObjectJSON = object.toJSON();
-            origObjectJSON.key = object.key;
-            return origObjectJSON;
-        });
-        return origJSON;
-    };
+        // add a method to add the "key" property to object output
+        canvas.toJSONWithKeys = () => {
+            let origJSON = canvas.toJSON();
+            origJSON.objects = canvas.getObjects().map((object: any) => {
+                let origObjectJSON = object.toJSON();
+                origObjectJSON.key = object.key;
+                return origObjectJSON;
+            });
+            return origJSON;
+        };
 
-    renderCanvasFromLayoutData(props.layout);
+        renderCanvasFromLayoutData(props.layout);
+    });
 
     let largestDimension = getLargestDisplayDimension(props.displays);
 
