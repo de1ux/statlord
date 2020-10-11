@@ -1,10 +1,17 @@
 import * as React from 'react';
+import {useEffect, useState} from 'react';
 import {serializeImageDataToBW} from './Serialization';
-import {ControlAddedMessage, ControlUpdatedMessage, ElementAddedMessage, UPDATE_SELECTED_OBJECT} from './Store';
+import {
+    ControlAddedMessage,
+    ControlUpdatedMessage,
+    ElementAddedMessage,
+    RequestCanvasRenderMessage,
+    State,
+    UPDATE_SELECTED_OBJECT
+} from './Store';
 import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, getLargestDisplayDimension} from './Utiltities';
 import {Display, Layout} from "./Models";
-import {useDispatch} from "react-redux";
-import {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
 
 declare var fabric: any;
 
@@ -14,10 +21,72 @@ interface CanvasProps {
 }
 
 export const Canvas = (props: CanvasProps) => {
-    let canvas: any;
+    const [canvas, setCanvas] = useState();
+
     let controls: Map<String, any> = new Map();
     let displays: Map<String, Array<number>> = new Map();
     const dispatch = useDispatch();
+
+    const controlAdded = useSelector<State, ControlAddedMessage>(
+        state => state.controlAdded
+    );
+    const elementAdded = useSelector<State, ElementAddedMessage>(
+        state => state.elementAdded
+    );
+    const requestCanvasRender = useSelector<State, RequestCanvasRenderMessage>(
+        state => state.requestCanvasRender
+    );
+
+    useEffect(() => {
+        if (!controlAdded) {
+            return;
+        }
+        addControl(controlAdded);
+    }, [controlAdded]);
+
+    useEffect(() => {
+        if (!elementAdded) {
+            return;
+        }
+        addElement(elementAdded);
+    }, [elementAdded]);
+
+    useEffect(() => {
+        if (!requestCanvasRender) {
+            return;
+        }
+        if (!canvas) {
+            return;
+        }
+        canvas.renderAll();
+    });
+
+    useEffect(() => {
+        if (canvas) {
+            return;
+        }
+        const newCanvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
+
+        // add a method to add the "key" property to object output
+        newCanvas.toJSONWithKeys = () => {
+            let origJSON = canvas.toJSON();
+            origJSON.objects = canvas.getObjects().map((object: any) => {
+                let origObjectJSON = object.toJSON();
+                origObjectJSON.key = object.key;
+                return origObjectJSON;
+            });
+            return origJSON;
+        };
+
+        setCanvas(newCanvas);
+    });
+
+    useEffect(() => {
+        if (!canvas) {
+            return
+        }
+        renderCanvasFromLayoutData(canvas, props.layout);
+    }, [canvas]);
 
     const writeFutureCanvasData = async () => {
         if (canvas === undefined) {
@@ -126,7 +195,7 @@ export const Canvas = (props: CanvasProps) => {
         }
     };
 
-    const renderCanvasFromLayoutData = (layout: Layout) => {
+    const renderCanvasFromLayoutData = (canvas: any, layout: Layout) => {
         let layoutData = JSON.parse(layout.data);
         canvas.loadFromJSON(layoutData, () => {
             canvas.getObjects().map((object: any) => {
@@ -197,7 +266,7 @@ export const Canvas = (props: CanvasProps) => {
         }
 
         let textProperties = {
-            ...defaultTextProperties(),
+            ...defaultTextProperties,
             left: 10,
             top: 10,
             key: message.control.key,
@@ -219,7 +288,7 @@ export const Canvas = (props: CanvasProps) => {
         switch (message.element) {
             case 'itext':
                 let textProperties = {
-                    ...defaultTextProperties(),
+                    ...defaultTextProperties,
                     left: 10,
                     top: 10,
                 };
@@ -234,23 +303,6 @@ export const Canvas = (props: CanvasProps) => {
                 alert(`Unrecognized element: ${message.element}`);
         }
     };
-
-    useEffect(() => {
-        canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
-
-        // add a method to add the "key" property to object output
-        canvas.toJSONWithKeys = () => {
-            let origJSON = canvas.toJSON();
-            origJSON.objects = canvas.getObjects().map((object: any) => {
-                let origObjectJSON = object.toJSON();
-                origObjectJSON.key = object.key;
-                return origObjectJSON;
-            });
-            return origJSON;
-        };
-
-        renderCanvasFromLayoutData(props.layout);
-    });
 
     let largestDimension = getLargestDisplayDimension(props.displays);
 

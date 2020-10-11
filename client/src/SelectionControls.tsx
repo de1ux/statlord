@@ -1,35 +1,27 @@
 import * as React from 'react';
-import {defaultTextProperties, TextValues} from './Utiltities';
-import {REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER} from "./Store";
-import {Unsubscribe} from "redux";
-import {useDispatch} from "react-redux";
+import {useState} from 'react';
+import {defaultTextProperties} from './Utiltities';
+import {REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER, State, UpdateSelectedObjectMessage} from "./Store";
+import {useDispatch, useSelector} from "react-redux";
 
 
-interface SelectionControlsProps {
-}
+export const SelectionControls = () => {
+    const dispatch = useDispatch();
 
-interface SelectionControlsState extends TextValues {
-    selected?: any
-}
+    const selected = useSelector<State, UpdateSelectedObjectMessage>(
+        state => state.updateSelectedObject
+    );
 
-export class SelectionControls extends React.Component<SelectionControlsProps, SelectionControlsState> {
-    unsubscribe: Unsubscribe;
+    let [textValues, setTextValues] = useState(defaultTextProperties);
 
-    constructor(props: SelectionControlsProps) {
-        super(props);
-
-        this.state = defaultTextProperties()
-    }
-
-    changeFontSize = (e: React.FormEvent<HTMLInputElement>) => {
-        const dispatch = useDispatch();
-
-        this.setState<any>({
-            fontSize: e.currentTarget.value,
+    const changeFontSize = (e: React.FormEvent<HTMLInputElement>) => {
+        setTextValues({
+            fontSize: parseInt(e.currentTarget.value),
+            fontFamily: textValues.fontFamily,
         });
 
-        // TODO - this is bad
-        this.state.selected.fontSize = e.currentTarget.value;
+        // TODO - this is bad; direct access to modify the current canvas object
+        selected.object.fontSize = e.currentTarget.value;
 
         dispatch({
             type: REQUEST_CANVAS_RENDER,
@@ -39,15 +31,14 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
         })
     };
 
-    changeFontFamily = (e: React.FormEvent<HTMLSelectElement>) => {
-        const dispatch = useDispatch();
-
-        this.setState<any>({
+    const changeFontFamily = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setTextValues({
+            fontSize: textValues.fontSize,
             fontFamily: e.currentTarget.value,
         });
 
-        // TODO - this is bad
-        this.state.selected.fontFamily = e.currentTarget.value;
+        // TODO - this is bad; direct access to modify the current canvas object
+        selected.object.fontFamily = e.currentTarget.value;
 
         dispatch({
             type: REQUEST_CANVAS_RENDER,
@@ -57,25 +48,18 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
         })
     };
 
-    componentWillUnmount(): void {
-        this.unsubscribe();
-    }
 
-    render() {
-        const dispatch = useDispatch();
-
-        if (this.state.selected === undefined) {
-            return <p>Nothing selected</p>
-        }
-
-        return <div>
+    return <div>
+        {selected ?
             <p>
                 <label>Font size</label>
-                <input type='number' value={this.state.fontSize} onChange={this.changeFontSize}/>
+                <input type='number' value={textValues.fontSize}
+                       onChange={changeFontSize}/>
                 <br/>
 
                 <label>Font family</label>
-                <select value={this.state.fontFamily} onChange={this.changeFontFamily}>
+                <select value={textValues.fontFamily}
+                        onChange={changeFontFamily}>
                     <option>Arial</option>
                     <option>Helvetica</option>
                 </select>
@@ -88,7 +72,7 @@ export class SelectionControls extends React.Component<SelectionControlsProps, S
                     }
                 })}>Delete
                 </button>
-            </p>
-        </div>
-    }
-}
+            </p> : <p>Nothing selected</p>
+        }
+    </div>
+};

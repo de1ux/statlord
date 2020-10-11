@@ -2,12 +2,23 @@ import * as React from 'react';
 import {CONTROL_ADDED, ELEMENT_ADDED, ResourceState, State} from './Store';
 import {Gauge} from "./Models";
 import {useDispatch, useSelector} from "react-redux";
+import api from "./api";
 
 export const Controls = () => {
     const dispatch = useDispatch();
     const gauges = useSelector<State, ResourceState<Array<Gauge>>>(
         state => state.gauges
     );
+
+    switch (gauges.state) {
+        case "init":
+            api.fetchGauges();
+            return <p>Loading...</p>;
+        case "loading":
+            return <p>Loading...</p>;
+        case "failed":
+            return <p>Failed: {gauges.reason}</p>;
+    }
 
     const addControl = (gauge: Gauge) => (e: React.MouseEvent) => {
         e.preventDefault();

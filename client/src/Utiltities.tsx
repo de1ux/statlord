@@ -9,12 +9,10 @@ export interface TextValues {
     fontSize: number;
 }
 
-export function defaultTextProperties(): TextValues {
-    return {
-        fontFamily: "Arial",
-        fontSize: 24,
-    }
-}
+export const defaultTextProperties = {
+    fontFamily: "Arial",
+    fontSize: 24,
+};
 
 export function getKeyFromURL(): string | null {
     let url = new URL(window.location.href);
@@ -42,13 +40,13 @@ export async function getLayout(key?: string): Promise<Layout> {
 }
 
 export function getLargestDisplayDimension(displays: Array<Display>): number {
-        let height = 0,
-            width = 0;
+    let height = 0,
+        width = 0;
 
-        for (let display of displays) {
-            width += display.resolution_x;
-            height += display.resolution_y;
-        }
-
-        return (width > height ? width : height) + 100;
+    for (let display of displays) {
+        width += display.resolution_x;
+        height += display.resolution_y;
     }
+
+    return (width > height ? width : height) + 100;
+}

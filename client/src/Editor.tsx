@@ -50,9 +50,9 @@ export const Editor = (props: OverlayProps) => {
         return <p>Failed to find a layout with key: {key}</p>
     }
 
-    // TODO - put <SelectionControls/> back in!!
     return <div style={{display: 'flex'}}>
         <div>
+            <SelectionControls/>
             <Controls/>
         </div>
         <Canvas displays={displays.data} layout={layout}/>
