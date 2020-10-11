@@ -38,6 +38,8 @@ export const Canvas = (props: CanvasProps) => {
         state => state.requestCanvasRender
     );
 
+    const [writeCanvasLoop, setWriteCanvasLoop] = useState<boolean>(false);
+
     useEffect(() => {
         if (!controlAdded) {
             return;
@@ -90,11 +92,6 @@ export const Canvas = (props: CanvasProps) => {
     }, [canvas]);
 
     const writeFutureCanvasData = async () => {
-        if (canvas === undefined) {
-            setTimeout(() => writeFutureCanvasData(), 500);
-            return;
-        }
-
         let fetches = [];
         for (let [key, position] of displays.entries()) {
             let display = props.displays.find((display: Display) => display.key === key),
@@ -120,6 +117,14 @@ export const Canvas = (props: CanvasProps) => {
         await Promise.all(fetches);
         setTimeout(() => writeFutureCanvasData(), 1000);
     };
+
+    useEffect(() => {
+        if (!canvas) {
+            return;
+        }
+
+        writeFutureCanvasData()
+    }, [canvas]);
 
     const writeFutureLayout = async () => {
         if (canvas === undefined) {
