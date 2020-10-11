@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {getAPIEndpoint} from './Utiltities';
-import {Display, Gauge, Layout} from "./Models";
+import {Display, Gauge, Layout} from "../models";
+import {getAPIEndpoint} from "../api";
 
 interface SetupWizardProps {
 }

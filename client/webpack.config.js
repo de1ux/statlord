@@ -35,6 +35,7 @@ module.exports = function makeWebpackConfig() {
   config.plugins = [];
 
   config.devServer = {
+    historyApiFallback: true,
     compress: true,
     port: 3000,
     hot: true
