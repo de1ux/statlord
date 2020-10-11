@@ -31,7 +31,7 @@ let scrape = async () => {
     const browser = await puppeteer.launch({headless: false});
     const page = await browser.newPage();
     page.on('console', message => console.log(`${message.type().substr(0, 3).toUpperCase()} ${message.text()}`))
-    await page.goto('http://localhost:8000/viewer/?key=InkyWhat');
+    await page.goto('http://localhost:8000/edit/main');
 
     const imageData = await page.evaluate(async () => {
         function normal(imageData) {

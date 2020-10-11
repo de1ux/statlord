@@ -4,6 +4,7 @@ import {useSelector} from "react-redux";
 import {Display, Layout} from "../models";
 import api from "../api";
 import {NavLink} from "react-router-dom";
+import {SetupWizard} from "./SetupWizard";
 
 interface HomeProps {
     store: GlobalStore;
@@ -40,20 +41,6 @@ export const Home = (props: HomeProps) => {
     return <div>
         <h1>Statlord</h1>
         <h2>Layouts</h2>
-        <ul>
-            {layouts.data.map(layout =>
-                <li key={layout.key}>
-                    <NavLink to={`/edit/${layout.key}`}>{layout.key}</NavLink>
-                </li>
-            )}
-        </ul>
-        <h2>Displays</h2>
-        <ul>
-            {displays.data.map(display =>
-                <li key={display.key}>
-                    <NavLink to={`/view/${display.key}`}>{display.key}</NavLink>
-                </li>
-            )}
-        </ul>
+        <SetupWizard />
     </div>
 };
