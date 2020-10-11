@@ -1,6 +1,6 @@
 import {GlobalStore, SET_DISPLAYS, SET_GAUGES, SET_LAYOUTS} from './Store';
 import {getAPIEndpoint} from './Utiltities';
-import {Models} from "./Models";
+import {Display, Gauge, Layout} from "./Models";
 
 export class ModelsProvider {
     private store: GlobalStore;
@@ -15,7 +15,7 @@ export class ModelsProvider {
         Promise.all([
             fetch(getAPIEndpoint() + '/layouts/')
                 .then(data => data.json())
-                .then((layouts: Array<Models.Layout>) => {
+                .then((layouts: Array<Layout>) => {
                     this.store.dispatch({
                         type: SET_LAYOUTS,
                         setLayouts: layouts,
@@ -23,7 +23,7 @@ export class ModelsProvider {
                 }),
             fetch(getAPIEndpoint() + '/displays/')
                 .then(data => data.json())
-                .then((displays: Array<Models.Display>) => {
+                .then((displays: Array<Display>) => {
                     this.store.dispatch({
                         type: SET_DISPLAYS,
                         setDisplays: displays,
@@ -31,7 +31,7 @@ export class ModelsProvider {
                 }),
             fetch(getAPIEndpoint() + '/gauges/')
                 .then(data => data.json())
-                .then((gauges: Array<Models.Gauge>) => {
+                .then((gauges: Array<Gauge>) => {
                     this.store.dispatch({
                         type: SET_GAUGES,
                         setGauges: gauges,

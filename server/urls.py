@@ -13,6 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.urls import path, re_path
 
 from statlord import views
@@ -25,9 +26,10 @@ urlpatterns = [
     path('api/layouts/', views.LayoutList.as_view()),
     path('api/layouts/<str:key>/', views.LayoutItem.as_view()),
 
-    re_path(r'^viewer/(?P<path>.*)', views.StaticAssets.as_view()),
+    url(r'^viewer/(?P<path>.*)', views.StaticAssets.as_view()),
     path('viewer/', views.StaticAssets.as_view()),
-    re_path(r'^editor/(?P<path>.*)', views.StaticAssets.as_view()),
+    url(r'^editor/(?P<path>.*)', views.StaticAssets.as_view()),
     path('editor/', views.StaticAssets.as_view()),
-
+    path('', views.StaticAssets.as_view()),
+    url(r'^(?P<path>.*)', views.StaticAssets.as_view()),
 ]

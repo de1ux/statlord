@@ -1,14 +1,14 @@
 import * as React from 'react';
-import {Models} from './Models';
 import {CONTROL_ADDED, CONTROL_UPDATED, ELEMENT_ADDED, GlobalStore} from './Store';
 import {getAPIEndpoint} from './Utiltities';
+import {Gauge} from "./Models";
 
 interface ControlsProps {
     store: GlobalStore
 }
 
 interface ControlsState {
-    guages: Array<Models.Gauge>;
+    guages: Array<Gauge>;
 }
 
 export class Controls extends React.Component<ControlsProps, ControlsState> {
@@ -46,7 +46,7 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
             })
     }
 
-    addControl = (gauge: Models.Gauge) => (e: React.MouseEvent) => {
+    addControl = (gauge: Gauge) => (e: React.MouseEvent) => {
         e.preventDefault();
         this.props.store.dispatch({
             type: CONTROL_ADDED,
@@ -68,7 +68,7 @@ export class Controls extends React.Component<ControlsProps, ControlsState> {
     };
 
     renderControls = () => {
-        return this.state.guages.map((gauge: Models.Gauge) =>
+        return this.state.guages.map((gauge: Gauge) =>
             <tr key={gauge.key}>
                 <td>{gauge.key}</td>
                 <td>{gauge.value}</td>

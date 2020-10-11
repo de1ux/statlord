@@ -1,18 +1,18 @@
 import * as React from 'react';
-import {Models} from './Models';
 import {getAPIEndpoint} from './Utiltities';
+import {Display, Gauge, Layout} from "./Models";
 
 interface SetupWizardProps {
 }
 
 interface SetupWizardState {
-    layouts: Array<Models.Layout>
-    displays: Array<Models.Display>
-    gauges: Array<Models.Gauge>
+    layouts: Array<Layout>
+    displays: Array<Display>
+    gauges: Array<Gauge>
 
-    newGauge: Models.Gauge
-    newLayout: Models.Layout
-    newDisplay: Models.Display
+    newGauge: Gauge
+    newLayout: Layout
+    newDisplay: Display
 }
 
 export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardState> {
@@ -50,19 +50,19 @@ export class SetupWizard extends React.Component<SetupWizardProps, SetupWizardSt
     reloadModels() {
         fetch(getAPIEndpoint() + '/layouts/')
             .then(data => data.json())
-            .then((layouts: Array<Models.Layout>) => {
+            .then((layouts: Array<Layout>) => {
                 this.setState({layouts: layouts});
             });
 
         fetch(getAPIEndpoint() + '/displays/')
             .then(data => data.json())
-            .then((displays: Array<Models.Display>) => {
+            .then((displays: Array<Display>) => {
                 this.setState({displays: displays});
             });
 
         fetch(getAPIEndpoint() + '/gauges/')
             .then(data => data.json())
-            .then((gauges: Array<Models.Gauge>) => {
+            .then((gauges: Array<Gauge>) => {
                 this.setState({gauges: gauges});
             });
     }

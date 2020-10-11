@@ -106,14 +106,14 @@ class LayoutItem(APIView):
 
 class StaticAssets(APIView):
     def get(self, request, path=None):
+        if not path:
+            path = "index.html"
+
         if settings.DEBUG:
             url = f"http://0.0.0.0:3000/{path}"
             req = Request(url)
             res = urlopen(req)
             return HttpResponse(res.read())
-
-        if not path:
-            path = "index.html"
 
         test_file = open(f'./static/{path}', 'r')
         return HttpResponse(content=test_file)

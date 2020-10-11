@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {Unsubscribe} from 'redux';
-import {Models} from './Models';
 import {serializeImageDataToBW} from './Serialization';
 import {
     ControlAddedMessage,
@@ -13,13 +12,13 @@ import {
     UPDATE_SELECTED_OBJECT
 } from './Store';
 import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, getLargestDisplayDimension} from './Utiltities';
-import set = Reflect.set;
+import {Display, Layout} from "./Models";
 
 declare var fabric: any;
 
 interface CanvasProps {
-    displays: Array<Models.Display>
-    layout: Models.Layout
+    displays: Array<Display>
+    layout: Layout
     store: GlobalStore;
 }
 
@@ -83,7 +82,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
 
         let fetches = [];
         for (let [key, position] of this.displays.entries()) {
-            let display = this.props.displays.find((display: Models.Display) => display.key === key),
+            let display = this.props.displays.find((display: Display) => display.key === key),
                 x = Math.floor(position[0]),
                 y = Math.floor(position[1]),
                 w = display.resolution_x,
@@ -129,7 +128,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         });
     }
 
-    renderCanvasFromLayoutData(layout: Models.Layout) {
+    renderCanvasFromLayoutData(layout: Layout) {
         let layoutData = JSON.parse(layout.data);
         this.canvas.loadFromJSON(layoutData, () => {
             this.canvas.getObjects().map((object: any) => {
@@ -156,7 +155,7 @@ export class Canvas extends React.Component<CanvasProps, CanvasState> {
         }
     }
 
-    renderDisplayBoundaries(displays: Array<Models.Display>, displayPositions?: Map<String, Array<number>>) {
+    renderDisplayBoundaries(displays: Array<Display>, displayPositions?: Map<String, Array<number>>) {
         if (this.canvas === undefined) {
             return;
         }

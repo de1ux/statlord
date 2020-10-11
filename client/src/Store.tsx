@@ -1,5 +1,5 @@
 import {createStore, Store} from 'redux';
-import {Models} from './Models';
+import {Display, Gauge, Layout} from "./Models";
 
 export const
     CONTROL_ADDED = 'CONTROL_ADDED',
@@ -13,28 +13,16 @@ export const
     REQUEST_CANVAS_DELETE_OBJECT = 'REQUEST_CANVAS_DELETE_OBJECT';
 
 export interface ControlAddedMessage {
-    control: Models.Gauge
+    control: Gauge
 }
 
 export interface ControlUpdatedMessage {
-    control: Models.Gauge
+    control: Gauge
 }
 
 export interface ElementAddedMessage {
     element: string
     when: number
-}
-
-export interface SetLayoutsMessage {
-    layouts: Array<Models.Layout>
-}
-
-export interface SetGaugesMessage {
-    gauges: Array<Models.Gauge>
-}
-
-export interface SetDisplaysMessage {
-    displays: Array<Models.Display>
 }
 
 export interface RequestCanvasRenderMessage {
@@ -49,13 +37,26 @@ export interface RequestCanvasDeleteObjectMessage {
     when: number
 }
 
+export interface SetLayoutsMessage {
+    layouts: Array<Layout>
+}
+
+export interface SetGaugesMessage {
+    gauges: Array<Gauge>
+}
+
+export interface SetDisplaysMessage {
+    displays: Array<Display>
+}
+
 export interface State {
+    layouts: Array<Layout>
+    gauges: Array<Gauge>
+    displays: Array<Display>
+
     elementAdded: ElementAddedMessage;
     controlAdded: ControlAddedMessage;
     controlUpdated: ControlUpdatedMessage;
-    setLayouts: SetLayoutsMessage;
-    setGauges: SetGaugesMessage;
-    setDisplays: SetDisplaysMessage;
     requestCanvasRender: RequestCanvasRenderMessage;
     updateSelectedObject: UpdateSelectedObjectMessage;
     requestCanvasDeleteObject: RequestCanvasDeleteObjectMessage;
@@ -63,6 +64,10 @@ export interface State {
 
 export interface Action extends State {
     type: string;
+
+    setLayouts: SetLayoutsMessage;
+    setGauges: SetGaugesMessage;
+    setDisplays: SetDisplaysMessage;
 }
 
 function reducer(state: State, action: Action) {
@@ -81,15 +86,15 @@ function reducer(state: State, action: Action) {
             };
         case SET_LAYOUTS:
             return {
-                ...state, setLayouts: action.setLayouts,
+                ...state, layouts: action.setLayouts,
             };
         case SET_GAUGES:
             return {
-                ...state, setGagues: action.setGauges,
+                ...state, gauges: action.setGauges,
             };
         case SET_DISPLAYS:
             return {
-                ...state, setDisplays: action.setDisplays,
+                ...state, displays: action.setDisplays,
             };
         case REQUEST_CANVAS_RENDER:
             return {

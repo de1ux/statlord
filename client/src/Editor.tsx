@@ -1,23 +1,23 @@
 import * as React from 'react';
 import {Canvas} from './Canvas';
 import {Controls} from './Controls';
-import {Models} from './Models';
 import {SelectionControls} from './SelectionControls';
 import {GlobalStore} from './Store';
 import {getAPIEndpoint} from './Utiltities';
 import {ViewOnlyCanvas} from './ViewOnlyCanvas';
+import {Display, Gauge, Layout} from "./Models";
 
 interface OverlayProps {
     store: GlobalStore;
     viewDisplayKey?: string;
-    layout?: Models.Layout
+    layout?: Layout
 }
 
 interface OverlayState {
-    selectedControl?: Models.Gauge;
+    selectedControl?: Gauge;
     selectedObject?: any;
 
-    displays: Array<Models.Display>;
+    displays: Array<Display>;
 }
 
 export class Editor extends React.Component<OverlayProps, OverlayState> {
@@ -36,7 +36,7 @@ export class Editor extends React.Component<OverlayProps, OverlayState> {
     setFutureDisplaysRefresh() {
         fetch(getAPIEndpoint() + '/displays/')
             .then(data => data.json())
-            .then((displays: Array<Models.Display>) => {
+            .then((displays: Array<Display>) => {
                 this.setState({
                     displays: displays,
                 });
@@ -55,7 +55,7 @@ export class Editor extends React.Component<OverlayProps, OverlayState> {
                 this.props.viewDisplayKey ?
                     <div>
                         <ViewOnlyCanvas store={this.props.store}
-                                        display={this.state.displays.find((display: Models.Display) => display.key === this.props.viewDisplayKey)}/>
+                                        display={this.state.displays.find((display: Display) => display.key === this.props.viewDisplayKey)}/>
                     </div> :
                     <div style={{display: 'flex'}}>
                         <div>

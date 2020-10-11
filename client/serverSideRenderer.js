@@ -13,15 +13,15 @@ let scrape = async () => {
                 'Content-Length': data.length
             }
         }, res => {
-          console.log(`statusCode: ${res.statusCode}`);
+            console.log(`statusCode: ${res.statusCode}`);
 
-          res.on('data', d => {
-            process.stdout.write(d)
-          })
+            res.on('data', d => {
+                process.stdout.write(d);
+            })
         });
 
         req.on('error', error => {
-          console.error(error)
+            console.error(error);
         });
 
         req.write(data);
@@ -68,6 +68,6 @@ let scrape = async () => {
     });
 
     send(JSON.stringify({'display_data': imageData}));
-}
+};
 
 scrape();

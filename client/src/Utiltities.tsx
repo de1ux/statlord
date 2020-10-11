@@ -1,4 +1,4 @@
-import {Models} from './Models';
+import {Display, Layout} from "./Models";
 
 export function getAPIEndpoint(): string {
     return "/api"
@@ -27,7 +27,7 @@ export function isWorker(): boolean {
 }
 
 
-export async function getLayout(key?: string): Promise<Models.Layout> {
+export async function getLayout(key?: string): Promise<Layout> {
     if (key === undefined || key === '') {
         key = getKeyFromURL();
         if (!key) {
@@ -47,7 +47,7 @@ export async function getLayout(key?: string): Promise<Models.Layout> {
         });
 }
 
-export function getLargestDisplayDimension(displays: Array<Models.Display>): number {
+export function getLargestDisplayDimension(displays: Array<Display>): number {
         let height = 0,
             width = 0;
 

@@ -1,13 +1,12 @@
 import * as React from 'react';
-import {Unsubscribe} from 'redux';
-import {Models} from './Models';
-import {GlobalStore, State} from './Store';
+import {GlobalStore} from './Store';
 import {getAPIEndpoint} from './Utiltities';
+import {Display} from "./Models";
 
 declare var fabric: any;
 
 interface ViewOnlyCanvasProps {
-    display: Models.Display
+    display: Display
     store: GlobalStore;
 }
 
@@ -32,7 +31,7 @@ export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnl
 
         fetch(getAPIEndpoint() + '/displays/' + this.props.display.key + '/')
             .then(data => data.json())
-            .then((display: Models.Display) => {
+            .then((display: Display) => {
                 let pixels: Array<number> = [];
                 for (let i = 0; i < display.display_data.length; i++) {
                     let code = display.display_data[i];

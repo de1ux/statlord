@@ -1,11 +1,12 @@
 // serializeImageDataToBW returns a string of bits indicating black and white
-import {Models} from './Models';
 
-export function serializeImageDataToBW(imageData: ImageData, display: Models.Display): string {
+import {Display} from "./Models";
+
+export function serializeImageDataToBW(imageData: ImageData, display: Display): string {
     return normal(imageData, display);
 }
 
-function normal(imageData: ImageData, display: Models.Display): string {
+function normal(imageData: ImageData, display: Display): string {
     let pixels = '';
     let i = -1;
     for (let pixel of imageData.data) {
@@ -25,7 +26,7 @@ function normal(imageData: ImageData, display: Models.Display): string {
     return pixels;
 }
 
-function fill(imageData: ImageData, display: Models.Display) {
+function fill(imageData: ImageData, display: Display) {
     let pixels = '';
     let i = -1;
     for (let pixel of imageData.data) {
@@ -41,7 +42,7 @@ function fill(imageData: ImageData, display: Models.Display) {
     return pixels;
 }
 
-function rotate(imageData: ImageData, display: Models.Display): string {
+function rotate(imageData: ImageData, display: Display): string {
     let pixels = normal(imageData, display);
     let rows = [];
     let x = 0;
