@@ -1,7 +1,33 @@
+import {Display, Layout} from "./models";
+
+export interface TextValues {
+    fontFamily: string;
+    fontSize: number;
+}
+
+export const defaultTextProperties: TextValues = {
+    fontFamily: "Arial",
+    fontSize: 24,
+};
+
+export function getKeyFromURL(): string | null {
+    let url = new URL(window.location.href);
+    return url.searchParams.get('key');
+}
+
+export function getLargestDisplayDimension(displays: Array<Display>): number {
+    let height = 0,
+        width = 0;
+
+    for (let display of displays) {
+        width += display.resolution_x;
+        height += display.resolution_y;
+    }
+
+    return (width > height ? width : height) + 100;
+}
+
 // serializeImageDataToBW returns a string of bits indicating black and white
-
-import {Display} from "./Models";
-
 export function serializeImageDataToBW(imageData: ImageData, display: Display): string {
     return normal(imageData, display);
 }
