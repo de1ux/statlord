@@ -1,11 +1,11 @@
 import * as React from 'react';
-import {GlobalStore, ResourceState, State} from './Store';
-import {Display, Layout} from "./Models";
+import {GlobalStore, ResourceState, State} from '../store';
+import {Display, Layout} from "../models";
 import {useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import api from "./api";
-import {Controls} from "./Controls";
-import {SelectionControls} from "./SelectionControls";
+import api from "../api";
+import {AddControls} from "./AddControls";
+import {ModifyControls} from "./ModifyControls";
 import {Canvas} from "./Canvas";
 
 interface OverlayProps {
@@ -52,8 +52,8 @@ export const Editor = (props: OverlayProps) => {
 
     return <div style={{display: 'flex'}}>
         <div>
-            <SelectionControls/>
-            <Controls/>
+            <ModifyControls/>
+            <AddControls/>
         </div>
         <Canvas displays={displays.data} layout={layout}/>
     </div>

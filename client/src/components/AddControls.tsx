@@ -1,10 +1,10 @@
 import * as React from 'react';
-import {CONTROL_ADDED, ELEMENT_ADDED, ResourceState, State} from './Store';
-import {Gauge} from "./Models";
+import {CONTROL_ADDED, ELEMENT_ADDED, ResourceState, State} from '../store';
+import {Gauge} from "../models";
 import {useDispatch, useSelector} from "react-redux";
-import api from "./api";
+import api from "../api";
 
-export const Controls = () => {
+export const AddControls = () => {
     const dispatch = useDispatch();
     const gauges = useSelector<State, ResourceState<Array<Gauge>>>(
         state => state.gauges

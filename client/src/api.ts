@@ -1,7 +1,11 @@
-import {getAPIEndpoint} from "./Utiltities";
-import {Display, Gauge, Layout} from "./Models";
-import {GlobalStore, SET_DISPLAYS, SET_GAUGES, SET_LAYOUTS} from "./Store";
+import {Display, Gauge, Layout} from "./models";
+import {SET_DISPLAYS, SET_GAUGES, SET_LAYOUTS} from "./store";
 import {useDispatch} from "react-redux";
+
+
+export function getAPIEndpoint(): string {
+    return "/api"
+}
 
 namespace api {
     export const fetchLayouts = () => {

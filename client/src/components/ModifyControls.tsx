@@ -1,11 +1,11 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {defaultTextProperties} from './Utiltities';
-import {REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER, State, UpdateSelectedObjectMessage} from "./Store";
+import {defaultTextProperties} from '../utiltities';
+import {REQUEST_CANVAS_DELETE_OBJECT, REQUEST_CANVAS_RENDER, State, UpdateSelectedObjectMessage} from "../store";
 import {useDispatch, useSelector} from "react-redux";
 
 
-export const SelectionControls = () => {
+export const ModifyControls = () => {
     const dispatch = useDispatch();
 
     const selected = useSelector<State, UpdateSelectedObjectMessage>(

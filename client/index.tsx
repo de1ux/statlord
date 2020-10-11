@@ -1,18 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {ControlsProvider} from './src/ControlsProvider';
-import {CreateGlobalStore} from './src/Store';
-import {Editor} from "./src/Editor";
-import {ModelsProvider} from "./src/ModelsProvider";
-import {Home} from "./src/Home";
+import {CreateGlobalStore} from './src/store';
+import {Editor} from "./src/components/Editor";
+import {Home} from "./src/components/Home";
 import {Provider} from "react-redux";
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 
 let store = CreateGlobalStore();
-
-// Providers
-new ControlsProvider(store);
-new ModelsProvider(store);
 
 ReactDOM.render(
     <Provider store={store}>
@@ -25,24 +19,3 @@ ReactDOM.render(
     </Provider>,
     document.getElementById('root')
 );
-
-/*
-if (getKeyFromURL() === null) {
-    ReactDOM.render(
-        <Provider store={store}>
-            <Home store={store}/>
-        </Provider>,
-        document.getElementById('root'));
-} else {
-    let viewDisplayKey: string | undefined = undefined;
-    if (window.location.href.indexOf('viewer') > -1) {
-        viewDisplayKey = getKeyFromURL()
-    }
-
-    getLayout().then((layout: Layout) => {
-        ReactDOM.render(
-            <Provider store={store}>
-                <Editor store={store} layout={layout} viewDisplayKey={viewDisplayKey}/>
-            </Provider>,
-    })
-}*/

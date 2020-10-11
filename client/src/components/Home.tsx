@@ -1,8 +1,8 @@
-import {GlobalStore, ResourceState, State} from "./Store";
+import {GlobalStore, ResourceState, State} from "../store";
 import * as React from "react";
 import {useSelector} from "react-redux";
-import {Layout} from "./Models";
-import api from "./api";
+import {Layout} from "../models";
+import api from "../api";
 import {NavLink} from "react-router-dom";
 
 interface HomeProps {

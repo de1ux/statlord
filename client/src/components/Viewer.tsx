@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {GlobalStore} from './Store';
-import {getAPIEndpoint} from './Utiltities';
-import {Display} from "./Models";
+import {GlobalStore} from '../store';
+import {Display} from "../models";
+import {getAPIEndpoint} from "../api";
 
 declare var fabric: any;
 
@@ -14,7 +14,7 @@ interface ViewOnlyCanvasState {
     largestDimension: number;
 }
 
-export class ViewOnlyCanvas extends React.Component<ViewOnlyCanvasProps, ViewOnlyCanvasState> {
+export class Viewer extends React.Component<ViewOnlyCanvasProps, ViewOnlyCanvasState> {
     canvas: any;
 
     constructor(props: ViewOnlyCanvasProps) {

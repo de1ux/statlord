@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {useEffect, useState} from 'react';
-import {serializeImageDataToBW} from './Serialization';
 import {
     ControlAddedMessage,
     ControlUpdatedMessage,
@@ -8,10 +7,12 @@ import {
     RequestCanvasRenderMessage,
     State,
     UPDATE_SELECTED_OBJECT
-} from './Store';
-import {defaultTextProperties, getAPIEndpoint, getKeyFromURL, getLargestDisplayDimension} from './Utiltities';
-import {Display, Layout} from "./Models";
+} from '../store';
+
+import {defaultTextProperties, getKeyFromURL, getLargestDisplayDimension, serializeImageDataToBW} from '../utiltities';
+import {Display, Layout} from "../models";
 import {useDispatch, useSelector} from "react-redux";
+import {getAPIEndpoint} from "../api";
 
 declare var fabric: any;
 

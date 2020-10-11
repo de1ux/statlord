@@ -1,6 +1,5 @@
 import {createStore, Store} from 'redux';
-import {Display, Gauge, Layout} from "./Models";
-import {Res} from "awesome-typescript-loader/dist/checker/protocol";
+import {Display, Gauge, Layout} from "./models";
 
 export const
     CONTROL_ADDED = 'CONTROL_ADDED',
