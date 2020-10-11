@@ -60,7 +60,7 @@ export const Canvas = (props: CanvasProps) => {
             return;
         }
         canvas.renderAll();
-    });
+    }, [requestCanvasRender]);
 
     useEffect(() => {
         if (canvas) {

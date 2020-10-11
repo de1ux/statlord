@@ -108,6 +108,8 @@ class StaticAssets(APIView):
             path = "index.html"
         if 'edit' in path:
             path = 'index.html'
+        if 'view' in path:
+            path = 'index.html'
 
         if settings.DEBUG:
             url = f"http://0.0.0.0:3000/{path}"

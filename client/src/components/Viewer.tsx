@@ -1,75 +1,98 @@
 import * as React from 'react';
-import {GlobalStore} from '../store';
+import {GlobalStore, ResourceState, State} from '../store';
 import {Display} from "../models";
-import {getAPIEndpoint} from "../api";
+import api, {getAPIEndpoint} from "../api";
+import {useSelector} from "react-redux";
+import {useParams} from "react-router-dom";
+import {useState} from "react";
+import {useEffect} from "react";
 
 declare var fabric: any;
 
-interface ViewOnlyCanvasProps {
-    display: Display
-    store: GlobalStore;
-}
+const readFutureDisplayData = async (canvas: any, display: Display) => {
+    fetch(getAPIEndpoint() + '/displays/' + display.key + '/')
+        .then(data => data.json())
+        .then((display: Display) => {
+            let pixels: Array<number> = [];
+            for (let i = 0; i < display.display_data.length; i++) {
+                let code = display.display_data[i];
+                if (code === "0") {
+                    pixels.push(255); // R
+                    pixels.push(255); // G
+                    pixels.push(255); // B
+                } else {
+                    pixels.push(0); // R
+                    pixels.push(0); // G
+                    pixels.push(0); // B
+                }
+                pixels.push(255); // A
+            }
 
-interface ViewOnlyCanvasState {
-    largestDimension: number;
-}
+            let pixelArray = new Uint8ClampedArray(pixels);
+            let imgData = new ImageData(pixelArray, display.resolution_x, display.resolution_y);
+            canvas.contextContainer.putImageData(
+                imgData,
+                0, 0, 0, 0, display.resolution_x, display.resolution_y);
 
-export class Viewer extends React.Component<ViewOnlyCanvasProps, ViewOnlyCanvasState> {
-    canvas: any;
+            setTimeout(() => readFutureDisplayData(canvas, display), 1000);
+        });
+};
 
-    constructor(props: ViewOnlyCanvasProps) {
-        super(props);
 
-        this.readFutureDisplayData();
-    }
+export const Viewer = () => {
+    let {displayKey} = useParams();
 
-    async readFutureDisplayData() {
-        if (this.canvas === undefined) {
-            setTimeout(() => this.readFutureDisplayData(), 500);
+    const [canvas, setCanvas] = useState();
+    const [refreshData, setRefreshData] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (displays.state !== 'success') {
+            // only attach fabricjs once the canvas is rendered
+            return
+        }
+        if (canvas) {
+            // already attached, skip
             return;
         }
 
-        fetch(getAPIEndpoint() + '/displays/' + this.props.display.key + '/')
-            .then(data => data.json())
-            .then((display: Display) => {
-                let pixels: Array<number> = [];
-                for (let i = 0; i < display.display_data.length; i++) {
-                    let code = display.display_data[i];
-                    if (code === "0") {
-                        pixels.push(255); // R
-                        pixels.push(255); // G
-                        pixels.push(255); // B
-                    } else {
-                        pixels.push(0); // R
-                        pixels.push(0); // G
-                        pixels.push(0); // B
-                    }
-                    pixels.push(255); // A
-                }
+        const newCanvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
+        setCanvas(newCanvas);
+    });
 
-                let pixelArray = new Uint8ClampedArray(pixels);
-                let imgData = new ImageData(pixelArray, display.resolution_x, display.resolution_y);
-                this.canvas.contextContainer.putImageData(
-                    imgData,
-                    0, 0, 0, 0, display.resolution_x, display.resolution_y);
-                console.log('Rendered to canvas from display');
+    const displays = useSelector<State, ResourceState<Array<Display>>>(
+        state => state.displays
+    );
 
-                setTimeout(() => this.readFutureDisplayData(), 500);
-            });
+    useEffect(() => {
+        if (!canvas) {
+            // canvas not ready, wait for it to attach
+            return
+        }
+
+        // display ready and refresh cycle not started
+        if (displays.state === 'success' && !refreshData) {
+            const display = displays.data.find((display) => display.key === displayKey);
+
+            readFutureDisplayData(canvas, display);
+            setRefreshData(true);
+        }
+    }, [canvas, displays]);
+
+    switch (displays.state) {
+        case "init":
+            api.fetchDisplays();
+            return <p>Loading...</p>;
+        case "loading":
+            return <p>Loading...</p>;
+        case "failed":
+            return <p>Failed: {displays.reason}</p>;
     }
 
-    componentDidMount(): void {
-        this.canvas = new fabric.Canvas('overlay', {enableRetinaScaling: false});
-
-    }
-
-    render() {
-        console.log('rendering read only');
-        return <canvas id="overlay"
-                       width={`${this.props.display.resolution_x}px`}
-                       height={`${this.props.display.resolution_y}px`}
-                       style={{border: '1px solid #aaa'}}>
-        </canvas>;
-    }
-}
+    const display = displays.data.find((display) => display.key === displayKey);
+    return <canvas id="overlay"
+                   width={`${display.resolution_x}px`}
+                   height={`${display.resolution_y}px`}
+                   style={{border: '1px solid #aaa'}}>
+    </canvas>;
+};
 
