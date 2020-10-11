@@ -73,6 +73,6 @@ A set of headless browsers that are rendering what each display "sees" in the la
 
 Rendered data is currently a matrix of bits -- 0 for white, and 1 for black. 
 
-## Displays
+### Displays
 
 All of the screens that will display data. It could be a bunch of Raspberry Pis with e-paper diplays, Arduinos with oleds, browser windows -- anything that can represent bw image data.
