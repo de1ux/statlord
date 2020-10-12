@@ -1,6 +1,6 @@
 import {GlobalStore, ResourceState, State} from "../store";
 import * as React from "react";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {Display, Layout} from "../models";
 import api from "../api";
 import {NavLink} from "react-router-dom";
@@ -11,6 +11,8 @@ interface HomeProps {
 }
 
 export const Home = (props: HomeProps) => {
+    const dispatch = useDispatch();
+
     const layouts = useSelector<State, ResourceState<Array<Layout>>>(
         state => state.layouts
     );
@@ -20,7 +22,7 @@ export const Home = (props: HomeProps) => {
 
     switch (layouts.state) {
         case "init":
-            api.fetchLayouts();
+            api.fetchLayouts(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -30,7 +32,7 @@ export const Home = (props: HomeProps) => {
 
     switch (displays.state) {
         case "init":
-            api.fetchDisplays();
+            api.fetchDisplays(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -40,7 +42,6 @@ export const Home = (props: HomeProps) => {
 
     return <div>
         <h1>Statlord</h1>
-        <h2>Layouts</h2>
-        <SetupWizard />
+        <SetupWizard/>
     </div>
 };

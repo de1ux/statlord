@@ -12,7 +12,7 @@ import {
 import {defaultTextProperties, getKeyFromURL, getLargestDisplayDimension, serializeImageDataToBW} from '../utiltities';
 import {Display, Layout} from "../models";
 import {useDispatch, useSelector} from "react-redux";
-import {getAPIEndpoint} from "../api";
+import api, {getAPIEndpoint} from "../api";
 
 declare var fabric: any;
 
@@ -22,11 +22,11 @@ interface CanvasProps {
 }
 
 export const Canvas = (props: CanvasProps) => {
+    const dispatch = useDispatch();
     const [canvas, setCanvas] = useState();
 
     let controls: Map<String, any> = new Map();
     let displays: Map<String, Array<number>> = new Map();
-    const dispatch = useDispatch();
 
     const controlAdded = useSelector<State, ControlAddedMessage>(
         state => state.controlAdded
@@ -103,15 +103,7 @@ export const Canvas = (props: CanvasProps) => {
             let displayData = canvas.contextContainer.getImageData(x, y, w, h);
             display.display_data = serializeImageDataToBW(displayData, display);
 
-            fetches.push(
-                fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
-                    method: 'PUT',
-                    body: JSON.stringify(display),
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                })
-            );
+            fetches.push(api.createOrUpdateDisplay(display));
         }
 
         await Promise.all(fetches);

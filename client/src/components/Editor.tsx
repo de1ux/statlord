@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {ResourceState, State} from '../store';
 import {Display, Layout} from "../models";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
 import api from "../api";
 import {AddControls} from "./AddControls";
@@ -10,6 +10,7 @@ import {Canvas} from "./Canvas";
 
 
 export const Editor = () => {
+    const dispatch = useDispatch();
     let {layoutKey} = useParams();
 
     const layouts = useSelector<State, ResourceState<Array<Layout>>>(
@@ -21,7 +22,7 @@ export const Editor = () => {
 
     switch (layouts.state) {
         case "init":
-            api.fetchLayouts();
+            api.fetchLayouts(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -31,7 +32,7 @@ export const Editor = () => {
 
     switch (displays.state) {
         case "init":
-            api.fetchDisplays();
+            api.fetchDisplays(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;

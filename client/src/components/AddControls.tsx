@@ -12,7 +12,7 @@ export const AddControls = () => {
 
     switch (gauges.state) {
         case "init":
-            api.fetchGauges();
+            api.fetchGauges(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;

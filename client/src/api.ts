@@ -1,6 +1,6 @@
 import {Display, Gauge, Layout} from "./models";
 import {SET_DISPLAYS, SET_GAUGES, SET_LAYOUTS} from "./store";
-import {useDispatch} from "react-redux";
+import {Dispatch} from "redux";
 
 
 export function getAPIEndpoint(): string {
@@ -8,8 +8,7 @@ export function getAPIEndpoint(): string {
 }
 
 namespace api {
-    export const fetchLayouts = () => {
-        const dispatch = useDispatch();
+    export const fetchLayouts = (dispatch: Dispatch<any>) => {
         dispatch({
             type: SET_LAYOUTS,
             setLayouts: {
@@ -30,8 +29,7 @@ namespace api {
             })
     };
 
-    export const fetchDisplays = () => {
-        const dispatch = useDispatch();
+    export const fetchDisplays = (dispatch: Dispatch<any>) => {
         dispatch({
             type: SET_DISPLAYS,
             setDisplays: {
@@ -52,9 +50,7 @@ namespace api {
             });
     };
 
-    export const fetchGauges = () => {
-        const dispatch = useDispatch();
-
+    export const fetchGauges = (dispatch: Dispatch<any>) => {
         dispatch({
             type: SET_GAUGES,
             setGauges: {
@@ -73,7 +69,55 @@ namespace api {
                     }
                 })
             });
-    }
+    };
+
+    export const deleteLayout = (layoutKey: string) => {
+        return fetch(getAPIEndpoint() + '/layouts/' + layoutKey + '/', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+    };
+
+    export const deleteDisplay = (displayKey: string) => {
+        return fetch(getAPIEndpoint() + '/displays/' + displayKey + '/', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+    };
+
+    export const createLayout = (layout: Layout) => {
+        return fetch(getAPIEndpoint() + '/layouts/' + layout.key + '/', {
+            method: 'PUT',
+            body: JSON.stringify(layout),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+    };
+
+    export const createOrUpdateDisplay = (display: Display) => {
+        return fetch(getAPIEndpoint() + '/displays/' + display.key + '/', {
+            method: 'PUT',
+            body: JSON.stringify(display),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+    };
+
+    export const createNewGauge = (gauge: Gauge) => {
+        return fetch(getAPIEndpoint() + '/gauges/' + gauge.key + '/', {
+            method: 'PUT',
+            body: JSON.stringify({'value': gauge.value}),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+    };
 }
 
 

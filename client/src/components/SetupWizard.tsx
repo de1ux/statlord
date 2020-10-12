@@ -1,19 +1,21 @@
 import * as React from 'react';
+import {useState} from 'react';
 import {Display, Gauge, Layout} from "../models";
 import api, {getAPIEndpoint} from "../api";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {ResourceState, State} from "../store";
-import {useState} from "react";
 import {NavLink} from "react-router-dom";
 
 export const SetupWizard = () => {
-    const [newLayout, setNewLayout] = useState({
+    const dispatch = useDispatch();
+
+    const [newLayout, setNewLayout] = useState<Layout>({
         key: 'default',
         data: '',
         display_positions: '',
 
     });
-    const [newDisplay, setNewDisplay] = useState({
+    const [newDisplay, setNewDisplay] = useState<Display>({
         key: 'browser-a',
         resolution_x: 400,
         resolution_y: 600,
@@ -22,7 +24,7 @@ export const SetupWizard = () => {
         rotation: 0,
 
     });
-    const [newGauge, setNewGauge] = useState({
+    const [newGauge, setNewGauge] = useState<Gauge>({
         key: 'time',
         value: (new Date).getTime().toString(),
     });
@@ -39,7 +41,7 @@ export const SetupWizard = () => {
 
     switch (layouts.state) {
         case "init":
-            api.fetchLayouts();
+            api.fetchLayouts(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -49,7 +51,7 @@ export const SetupWizard = () => {
 
     switch (displays.state) {
         case "init":
-            api.fetchDisplays();
+            api.fetchDisplays(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -59,7 +61,7 @@ export const SetupWizard = () => {
 
     switch (gauges.state) {
         case "init":
-            api.fetchGauges();
+            api.fetchGauges(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
@@ -68,43 +70,37 @@ export const SetupWizard = () => {
     }
 
     const reloadModels = () => {
-        api.fetchGauges();
-        api.fetchDisplays();
-        api.fetchLayouts();
-    }
+        api.fetchGauges(dispatch);
+        api.fetchDisplays(dispatch);
+        api.fetchLayouts(dispatch);
+    };
 
     const createNewGauge = () => {
-        fetch(getAPIEndpoint() + '/gauges/' + newGauge.key + '/', {
-            method: 'PUT',
-            body: JSON.stringify({'value': newGauge.value}),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        }).then(() => {
+        api.createNewGauge(newGauge).then(() => {
             reloadModels();
         });
     };
 
     const createNewDisplay = () => {
-        fetch(getAPIEndpoint() + '/displays/' + newDisplay.key + '/', {
-            method: 'PUT',
-            body: JSON.stringify(newDisplay),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        }).then(() => {
+        api.createOrUpdateDisplay(newDisplay).then(() => {
             reloadModels();
         });
     };
 
     const createNewLayout = () => {
-        fetch(getAPIEndpoint() + '/layouts/' + newLayout.key + '/', {
-            method: 'PUT',
-            body: JSON.stringify(newLayout),
-            headers: {
-                'Content-Type': 'application/json'
-            },
-        }).then(() => {
+        api.createLayout(newLayout).then(() => {
+            reloadModels();
+        });
+    };
+
+    const deleteLayout = (layoutKey: string) => (e: React.MouseEvent) => {
+        api.deleteLayout(layoutKey).then(() => {
+            reloadModels();
+        });
+    };
+
+    const deleteDisplay = (displayKey: string) => (e: React.MouseEvent) => {
+        api.deleteDisplay(displayKey).then(() => {
             reloadModels();
         });
     };
@@ -121,7 +117,11 @@ export const SetupWizard = () => {
                 <ul>
                     {layouts.data.map((layout) => {
                         return <li key={layout.key}>
-                            {layout.key} (<NavLink to={`/edit/${layout.key}`}>edit</NavLink>)
+                            {layout.key}
+                            (<NavLink to={`/edit/${layout.key}`}>edit</NavLink>)
+                            (
+                            <button onClick={deleteLayout(layout.key)}>delete</button>
+                            )
                         </li>;
                     })}
                 </ul>
@@ -143,7 +143,11 @@ export const SetupWizard = () => {
                 <ul>
                     {displays.data.map((display) => {
                         return <li key={display.key}>
-                            <NavLink to={`/view/${display.key}`}>{display.key}</NavLink>
+                            {display.key}
+                            (<NavLink to={`/view/${display.key}`}>view</NavLink>)
+                            (
+                            <button onClick={deleteDisplay(display.key)}>delete</button>
+                            )
                         </li>;
                     })}
                 </ul>
@@ -210,5 +214,4 @@ export const SetupWizard = () => {
             </div>
         </div>
     </div>;
-
 };

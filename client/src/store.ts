@@ -37,18 +37,6 @@ export interface RequestCanvasDeleteObjectMessage {
     when: number
 }
 
-export interface SetLayoutsMessage {
-    layouts: Array<Layout>
-}
-
-export interface SetGaugesMessage {
-    gauges: Array<Gauge>
-}
-
-export interface SetDisplaysMessage {
-    displays: Array<Display>
-}
-
 export type ResourceInitialState = {
     state: "init";
 };
@@ -90,9 +78,9 @@ export interface State {
 export interface Action extends State {
     type: string;
 
-    setLayouts: SetLayoutsMessage;
-    setGauges: SetGaugesMessage;
-    setDisplays: SetDisplaysMessage;
+    setLayouts: ResourceState<Array<Layout>>;
+    setGauges: ResourceState<Array<Gauge>>;
+    setDisplays: ResourceState<Array<Display>>;
 }
 
 function reducer(state: State, action: Action) {

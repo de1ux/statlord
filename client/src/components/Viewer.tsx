@@ -2,7 +2,7 @@ import * as React from 'react';
 import {GlobalStore, ResourceState, State} from '../store';
 import {Display} from "../models";
 import api, {getAPIEndpoint} from "../api";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
 import {useState} from "react";
 import {useEffect} from "react";
@@ -40,6 +40,7 @@ const readFutureDisplayData = async (canvas: any, display: Display) => {
 
 
 export const Viewer = () => {
+    const dispatch = useDispatch();
     let {displayKey} = useParams();
 
     const [canvas, setCanvas] = useState();
@@ -80,7 +81,7 @@ export const Viewer = () => {
 
     switch (displays.state) {
         case "init":
-            api.fetchDisplays();
+            api.fetchDisplays(dispatch);
             return <p>Loading...</p>;
         case "loading":
             return <p>Loading...</p>;
