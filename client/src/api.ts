@@ -58,7 +58,7 @@ namespace api {
             },
         });
 
-        fetch(getAPIEndpoint() + "/gauges/")
+        return fetch(getAPIEndpoint() + "/gauges/")
             .then(data => data.json())
             .then((gauges: Array<Gauge>) => {
                 dispatch({

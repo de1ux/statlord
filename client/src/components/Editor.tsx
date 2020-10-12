@@ -1,17 +1,20 @@
 import * as React from 'react';
-import {ResourceState, State} from '../store';
+import {CONTROL_UPDATED, ResourceState, State} from '../store';
 import {Display, Layout} from "../models";
 import {useDispatch, useSelector} from "react-redux";
 import {useParams} from "react-router-dom";
-import api from "../api";
+import api, {getAPIEndpoint} from "../api";
 import {AddControls} from "./AddControls";
 import {ModifyControls} from "./ModifyControls";
 import {Canvas} from "./Canvas";
+import {useEffect, useState} from "react";
 
 
 export const Editor = () => {
     const dispatch = useDispatch();
     let {layoutKey} = useParams();
+
+    const [runningGaugeRefreshLoop, setRunningGaugeRefreshLoop] = useState(false);
 
     const layouts = useSelector<State, ResourceState<Array<Layout>>>(
         state => state.layouts
@@ -19,6 +22,30 @@ export const Editor = () => {
     const displays = useSelector<State, ResourceState<Array<Display>>>(
         state => state.displays
     );
+
+    const setFutureGaugesRefresh = () => {
+        fetch(getAPIEndpoint() + "/gauges/")
+            .then(data => data.json())
+            .then((data) => {
+                for (let gauge of data) {
+                    dispatch({
+                        type: CONTROL_UPDATED,
+                        controlUpdated: {
+                            control: gauge,
+                        },
+                    })
+                }
+
+                setTimeout(() => setFutureGaugesRefresh(), 1000);
+            })
+    };
+
+    useEffect(() => {
+        if (!runningGaugeRefreshLoop) {
+            setFutureGaugesRefresh();
+            setRunningGaugeRefreshLoop(true);
+        }
+    });
 
     switch (layouts.state) {
         case "init":

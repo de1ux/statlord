@@ -3,6 +3,7 @@ import {CONTROL_ADDED, ELEMENT_ADDED, ResourceState, State} from '../store';
 import {Gauge} from "../models";
 import {useDispatch, useSelector} from "react-redux";
 import api from "../api";
+import {useEffect} from "react";
 
 export const AddControls = () => {
     const dispatch = useDispatch();

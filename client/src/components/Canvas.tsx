@@ -4,13 +4,13 @@ import {
     ControlAddedMessage,
     ControlUpdatedMessage,
     ElementAddedMessage,
-    RequestCanvasRenderMessage,
+    RequestCanvasRenderMessage, ResourceState,
     State,
     UPDATE_SELECTED_OBJECT
 } from '../store';
 
 import {defaultTextProperties, getKeyFromURL, getLargestDisplayDimension, serializeImageDataToBW} from '../utiltities';
-import {Display, Layout} from "../models";
+import {Display, Gauge, Layout} from "../models";
 import {useDispatch, useSelector} from "react-redux";
 import api, {getAPIEndpoint} from "../api";
 
@@ -25,8 +25,8 @@ export const Canvas = (props: CanvasProps) => {
     const dispatch = useDispatch();
     const [canvas, setCanvas] = useState();
 
-    let controls: Map<String, any> = new Map();
-    let displays: Map<String, Array<number>> = new Map();
+    const [controls, setControls] = useState(new Map());
+    const [displays, setDisplays] = useState(new Map());
 
     const controlAdded = useSelector<State, ControlAddedMessage>(
         state => state.controlAdded
@@ -37,8 +37,10 @@ export const Canvas = (props: CanvasProps) => {
     const requestCanvasRender = useSelector<State, RequestCanvasRenderMessage>(
         state => state.requestCanvasRender
     );
-
-    const [writeCanvasLoop, setWriteCanvasLoop] = useState<boolean>(false);
+    const gauges = useSelector<State, ResourceState<Array<Gauge>>>(
+        state => state.gauges
+    );
+    const [runningCanvasWriteLoops, setRunningCanvasWriteLoops] = useState<boolean>(false);
 
     useEffect(() => {
         if (!controlAdded) {
@@ -65,6 +67,8 @@ export const Canvas = (props: CanvasProps) => {
     }, [requestCanvasRender]);
 
     useEffect(() => {
+        // when the HTML5 canvas element mounts, and fabricjs canvas isn't mounted
+        // create a fabricjs canvas and attach a method for exporing object to json (layout)
         if (canvas) {
             return;
         }
@@ -72,8 +76,8 @@ export const Canvas = (props: CanvasProps) => {
 
         // add a method to add the "key" property to object output
         newCanvas.toJSONWithKeys = () => {
-            let origJSON = canvas.toJSON();
-            origJSON.objects = canvas.getObjects().map((object: any) => {
+            let origJSON = newCanvas.toJSON();
+            origJSON.objects = newCanvas.getObjects().map((object: any) => {
                 let origObjectJSON = object.toJSON();
                 origObjectJSON.key = object.key;
                 return origObjectJSON;
@@ -84,12 +88,28 @@ export const Canvas = (props: CanvasProps) => {
         setCanvas(newCanvas);
     });
 
-    useEffect(() => {
-        if (!canvas) {
-            return
+    const controlUpdated = (gauge: Gauge) => {
+        if (controls.get(gauge.key) === undefined) {
+            return;
         }
-        renderCanvasFromLayoutData(canvas, props.layout);
-    }, [canvas]);
+
+        controls.get(gauge.key).text = gauge.value;
+    };
+
+    useEffect(() => {
+        // when gauges change, incrementally feed changes into underlying fabricjs objects
+        if (!canvas) {
+            return;
+        }
+        if (gauges.state !== 'success') {
+            return;
+        }
+
+        for (let gauge of gauges.data) {
+            controlUpdated(gauge);
+        }
+        canvas.renderAll();
+    }, [gauges]);
 
     const writeFutureCanvasData = async () => {
         let fetches = [];
@@ -111,25 +131,29 @@ export const Canvas = (props: CanvasProps) => {
     };
 
     useEffect(() => {
+        // when canvas becomes ready
+        // 1) render any preexisting layout data from the server
+        // 2) start a loop to push layout/display data to the server
         if (!canvas) {
             return;
         }
 
-        writeFutureCanvasData()
+        renderCanvasFromLayoutData(canvas, props.layout);
+
+        if (!runningCanvasWriteLoops) {
+            writeFutureCanvasData();
+            writeFutureLayout();
+            setRunningCanvasWriteLoops(true);
+        }
     }, [canvas]);
 
     const writeFutureLayout = async () => {
-        if (canvas === undefined) {
-            setTimeout(() => writeFutureLayout(), 500);
-            return;
-        }
-
         let body = JSON.stringify({
             'data': canvas.toJSONWithKeys(),
             'display_positions': JSON.stringify([...displays]),
         });
 
-        fetch(getAPIEndpoint() + '/layouts/' + getKeyFromURL() + '/', {
+        fetch(getAPIEndpoint() + '/layouts/' + props.layout.key + '/', {
             method: 'PUT',
             body: body,
             headers: {
@@ -185,10 +209,15 @@ export const Canvas = (props: CanvasProps) => {
             attatchDisplayEventHandlers(rect);
             attachTextEventHandlers(rect);
             canvas.add(rect);
+
+            // push to the background now (controls should always be on "top"),
+            // and whenever focus lost
             rect.moveTo(-100);
+            rect.on('deselected', () => {
+                rect.moveTo(-100);
+            });
 
             displays.set(display.key, [left, top]);
-
             offsetLeft += display.resolution_x;
         }
     };
@@ -197,9 +226,8 @@ export const Canvas = (props: CanvasProps) => {
         let layoutData = JSON.parse(layout.data);
         canvas.loadFromJSON(layoutData, () => {
             canvas.getObjects().map((object: any) => {
-                // TODO - this is a jank way of reinitializing controls
                 if (object.key) {
-                    controls.set(object.key, object);
+                    setControls(new Map(controls.set(object.key, object)))
                 }
                 if (object.type === 'text' || object.type === 'i-text') {
                     attachTextEventHandlers(object);
@@ -217,19 +245,6 @@ export const Canvas = (props: CanvasProps) => {
             renderDisplayBoundaries();
         } else {
             renderDisplayBoundaries(new Map(JSON.parse(props.layout.display_positions)));
-        }
-    };
-
-
-    const controlUpdated = (message: ControlUpdatedMessage) => {
-        if (controls.get(message.control.key) === undefined) {
-            return;
-        }
-
-        controls.get(message.control.key).text = message.control.value;
-
-        if (canvas) {
-            canvas.renderAll();
         }
     };
 
@@ -274,7 +289,8 @@ export const Canvas = (props: CanvasProps) => {
         attachTextEventHandlers(text);
         canvas.add(text);
 
-        controls.set(message.control.key, text);
+        // TODO - clunky immutable ES6 map set
+        setControls(new Map(controls.set(message.control.key, text)));
         text.moveTo(100);
     };
 

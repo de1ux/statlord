@@ -90,8 +90,21 @@ function reducer(state: State, action: Action) {
                 ...state, controlAdded: action.controlAdded
             };
         case CONTROL_UPDATED:
+            if (state.gauges.state !== 'success') {
+                return state;
+            }
+
             return {
-                ...state, controlUpdated: action.controlUpdated
+                ...state, gauges: {
+                    state: 'success',
+                    // Update each gauge in state in-place
+                    data: state.gauges.data.map((item: Gauge, index: number) => {
+                        if (item.key === action.controlUpdated.control.key) {
+                            return action.controlUpdated.control;
+                        }
+                        return item;
+                    }),
+                }
             };
         case ELEMENT_ADDED:
             return {
