@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/de1ux/statlord.svg?branch=master)](https://travis-ci.org/de1ux/statlord)
 
-> Display realtime data on spare OLEDs, e-paper, LCDs, and browsers
+> Make a dashboard from the web, stream it across many displays of any make and size
 
 ![demo](docs/demo.gif)
 
